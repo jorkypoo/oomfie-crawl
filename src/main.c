@@ -9,7 +9,7 @@ void render(game* game);
 
 
 menu current;
-screen cur;
+//screen scrn = {0};
 
 
 int main(int argc, char* argv[]) {
@@ -19,7 +19,9 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  current = get_menu(game.renderer, SCREEN_MAIN_MENU);
+  //init_screen(&scrn);
+  //scrn.current_menu = get_menu(game.renderer, 0);
+  current = get_menu(game.renderer, 0);
 
   /*SDL_Log("%f,%f\n%f,%f", current.buttons[0]->rect.x, current.buttons[0]->rect.y,\
                           current.buttons[1]->rect.x, current.buttons[1]->rect.y); */
@@ -36,6 +38,7 @@ int main(int argc, char* argv[]) {
     // fps shit
     SDL_Delay(15/1000);
   }
+  //free_menu(&scrn.current_menu);
   free_menu(&current);
   quit_game(&game);
   return 0;
@@ -77,19 +80,23 @@ void input(game *game) {
             // toggle_fullscreen_mode(game); // fullscreen not worky wah
             break;
           case SDLK_F8:
+            //free_menu(&scrn.current_menu);
+            //scrn.current_menu = get_menu(game->renderer, 0);
             free_menu(&current);
-            current = get_menu(game->renderer, SCREEN_MAIN_MENU);
+            current = get_menu(game->renderer, 0);
             break;
           case SDLK_F10:
+            //free_menu(&scrn.current_menu);
+            //scrn.current_menu = get_menu(game->renderer, 1);
             free_menu(&current);
-            current = get_menu(game->renderer, SCREEN_OPTIONS);
+            current = get_menu(game->renderer, 1);
             break;
       }
     }
   
   // handle input RE current menu
   handle_menu_event(&game->mouse_pos, &current, &e);
-  //SDL_Log("%f,%f", current.buttons[0]->rect.x, current.buttons[1]->rect.x);
+  //handle_screen_input(&game->mouse_pos, &scrn, &e);
   }
 }
 
@@ -108,4 +115,5 @@ void render(game* game) {
   
   // render the current menu
   render_menu(game->renderer, &current);
+  //render_screen(game->renderer, &scrn);
 }

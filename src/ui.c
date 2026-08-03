@@ -37,27 +37,27 @@ void update_button_pos_relative(button* b, float x, float y) {
 
 
 void init_screen(screen* s) {
-  s->current = 0;
+  ;
 }
 
 
-void add_menu_to_screen(screen* s, menu* m) {
-  
+void update_screen_current_menu(screen* s, menu* m) {
+  ;
 }
 
 
 void handle_screen_input(mouse_position* mpos, screen* s, SDL_Event* e) {
-  
+  handle_menu_event(mpos, s->current_menu, e);
 }
 
 
 void render_screen(SDL_Renderer* r, screen* s) {
-  render_menu(r, s->menus[s->current]);
+  render_menu(r, s->current_menu);
 }
 
 
 void destroy_screen(screen* s) {
-  
+  ;
 }
 
 
@@ -93,10 +93,8 @@ void handle_menu_event(mouse_position* mpos, menu* menu, SDL_Event* e) {
       SDL_Log("warning! button no. %d in menu is...invalid?", i);
       continue;
     }
-    handle_button_event(mpos, menu->buttons[i], e);
-    // want to change this to
-    // for (int i = 0; i < menu->buttons.count; i++)
-    // menu->buttons[i].handle_event(mpos, e);
+    //handle_button_event(mpos, menu->buttons[i], e);
+    menu->buttons[i]->handle_event(mpos, menu->buttons[i], e);
   }
 }
 
@@ -107,16 +105,25 @@ void render_menu(SDL_Renderer* r, menu* menu) {
       SDL_Log("warning! button no. %d in menu is...invalid?", i);
       continue;
     }
-    render_button(r, menu->buttons[i]);
-  }}
+    //render_button(r, menu->buttons[i]);
+    menu->buttons[i]->render(r, menu->buttons[i]);
+  }
+}
 
 
-void init_button(button* target, float x, float y, float w, float h, void (*callback)()) {
+void init_button(button* target, float x, float y, float w, float h,\
+                 void (*callback)(void* callback_data), void* userdata) {
+
   target->hovered = 0;
   target->clicked = 0;
   SDL_FRect r = {x, y, w, h};
   target->rect = r;
+
   target->callback = callback;
+  target->handle_event = handle_button_event;
+  target->render = render_button;
+
+  target->userdata = userdata;
 
   target->tex_default = NURUPO;
   target->tex_hovered = NURUPO;
@@ -162,14 +169,14 @@ void init_button_text(SDL_Renderer* r, button* target, char* text) {
 }
 
 
-void handle_button_event(mouse_position* mouse, button* b, SDL_Event* event) {
-  b->hovered = on_button(b, mouse->x, mouse->y);
+void handle_button_event(mouse_position* mpos, button* b, SDL_Event* event) {
+  b->hovered = on_button(b, mpos->x, mpos->y);
   
   switch (event->type) {
     case SDL_EVENT_MOUSE_BUTTON_DOWN: {
       if (b->hovered && b->callback && event->button.button == SDL_BUTTON_LEFT) {
         b->clicked = 1;
-        b->callback();
+        b->callback(b->userdata);
       }
       break;
     }

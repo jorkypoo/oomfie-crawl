@@ -6,8 +6,10 @@
 #define BTN_PATH2 "assets/button_pressed.png"
 
 
-void test_btn_func() { SDL_Log("hi from button"); }
-void test_btn_text() { SDL_Log("hi fromt textured button"); }
+void* callback1 = 0;
+void test_btn_text(void* userdata) { 
+  SDL_Log("hi from textured button"); 
+}
 
 
 menu get_main_menu(SDL_Renderer* renderer) {
@@ -16,10 +18,10 @@ menu get_main_menu(SDL_Renderer* renderer) {
   button* test_button = malloc(sizeof(button));
   button* test_button2 = malloc(sizeof(button));
 
-  init_button(test_button, 480, 0, 80, 48, test_btn_func);
+  init_button(test_button, 480, 0, 80, 48, test_btn_text, callback1);
   init_button_textures(renderer, test_button, BTN_PATH, BTN_PATH2, NULL);
 
-  init_button(test_button2, 560, 0, 80, 48, test_btn_func);
+  init_button(test_button2, 560, 0, 80, 48, test_btn_text, callback1);
   init_button_textures(renderer, test_button2, BTN_PATH, BTN_PATH2, NULL);
 
   menu dest;
@@ -31,14 +33,20 @@ menu get_main_menu(SDL_Renderer* renderer) {
 }
 
 
+void* callback2 = 0;
+void test_btn_func(void* userdata) { 
+  SDL_Log("hi from button"); 
+}
+
+
 menu get_options_menu(SDL_Renderer* renderer) {
   //if (!renderer) return {0};
 
   button* b1 = malloc(sizeof(button));
   button* b2 = malloc(sizeof(button));
   
-  init_button(b1, MENU_L_BOUND, 0, MENU_WIDTH, 32, test_btn_func);
-  init_button(b2, MENU_L_BOUND, 32, MENU_WIDTH, 32, test_btn_func);
+  init_button(b1, MENU_L_BOUND, 0, MENU_WIDTH, 32, test_btn_func, callback2);
+  init_button(b2, MENU_L_BOUND, 32, MENU_WIDTH, 32, test_btn_func, callback2);
 
   menu dest;
   init_menu(&dest);
