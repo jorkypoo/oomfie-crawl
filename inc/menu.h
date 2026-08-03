@@ -16,8 +16,12 @@
 #define MENU_WIDTH   160
 #define MENU_HEIGHT  480
 
+
+// returns a menu object
 menu get_main_menu(SDL_Renderer* renderer);
-void free_menu(menu* src);
-void get_options_menu(SDL_Renderer* renderer, menu* dest);
+menu get_options_menu(SDL_Renderer* renderer);
+
+// general menu grabbing thingy
+menu get_menu(SDL_Renderer* r, screen_id choice);
 
 #endif

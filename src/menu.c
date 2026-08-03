@@ -1,6 +1,5 @@
 #include "../inc/menu.h"
 
-#include <stdlib.h>
 
 // filepaths for textures
 #define BTN_PATH "assets/button_default.png"
@@ -28,29 +27,43 @@ menu get_main_menu(SDL_Renderer* renderer) {
   add_button_to_menu(&dest, test_button);
   add_button_to_menu(&dest, test_button2);
 
-  //if (!dest) return {0};
   return dest;
 }
 
 
-void free_menu(menu* src) {
-  for (int i = 0; i < src->count; i++) {
-    if (src->buttons[i]->text) free(src->buttons[i]->text);
-    free(src->buttons[i]);
-  }
-}
+menu get_options_menu(SDL_Renderer* renderer) {
+  //if (!renderer) return {0};
 
-
-void get_options_menu(SDL_Renderer* renderer, menu* dest) {
-  if (!renderer) return;
-
-  button test_button = { 0 };
-  button test_button2 = { 0 };
+  button* b1 = malloc(sizeof(button));
+  button* b2 = malloc(sizeof(button));
   
-  init_button(&test_button, MENU_L_BOUND, 0, MENU_WIDTH, 32, test_btn_func);
-  init_button(&test_button2, MENU_L_BOUND, 32, MENU_WIDTH, 32, test_btn_func);
+  init_button(b1, MENU_L_BOUND, 0, MENU_WIDTH, 32, test_btn_func);
+  init_button(b2, MENU_L_BOUND, 32, MENU_WIDTH, 32, test_btn_func);
 
-  init_menu(dest);
-  add_button_to_menu(dest, &test_button);
-  add_button_to_menu(dest, &test_button2);
+  menu dest;
+  init_menu(&dest);
+  add_button_to_menu(&dest, b1);
+  add_button_to_menu(&dest, b2);
+
+  return dest;
 }
+
+
+menu get_menu(SDL_Renderer* r, screen_id choice) {
+  menu ret;
+  
+  switch(choice) {
+    case SCREEN_MAIN_MENU:
+      ret = get_main_menu(r);
+      break;
+    case SCREEN_OPTIONS:
+      ret = get_options_menu(r);
+      break;
+    case SCREEN_CREDITS:
+      //get_credits_menu(r);
+      SDL_Log("not implemented yet");
+      break;
+  }
+  return ret;
+}
+

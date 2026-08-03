@@ -7,40 +7,25 @@ void input(game* game);
 void update(game* game);
 void render(game* game);
 
-menu current;
 
-void funcp() { SDL_Log("hu from button"); }
+menu current;
+screen cur;
 
 
 int main(int argc, char* argv[]) {
+
   game game = { 0 }; 
     if (!init_game(&game)) { 
     return 1;
   }
 
-  current = get_main_menu(game.renderer);
-  
-  button test_button;
-  button test_button2;
+  current = get_menu(game.renderer, SCREEN_MAIN_MENU);
 
-  /*
-  init_button(&test_button, 480, 0, 80, 48, funcp);
-  init_button_textures(game.renderer, &test_button, "assets/button_default.png", NULL, NULL);
-
-  init_button(&test_button2, 560, 0, 80, 48, funcp);
-  init_button_textures(game.renderer, &test_button2, NULL, NULL, NULL);
-
-  init_menu(&current);
-  add_button_to_menu(&current, &test_button);
-  add_button_to_menu(&current, &test_button2);
-  */
-  
-  SDL_Log("%f,%f\n%f,%f", current.buttons[0]->rect.x, current.buttons[0]->rect.y,\
-                          current.buttons[1]->rect.x, current.buttons[1]->rect.y);
+  /*SDL_Log("%f,%f\n%f,%f", current.buttons[0]->rect.x, current.buttons[0]->rect.y,\
+                          current.buttons[1]->rect.x, current.buttons[1]->rect.y); */
 
   while (game.running) {
     input(&game);
-    SDL_Log("%f, %f", current.buttons[0]->rect.x, current.buttons[1]->rect.x);
 
     init_rendering(&game);
     render(&game);
@@ -91,6 +76,14 @@ void input(game *game) {
           case SDLK_F3:
             // toggle_fullscreen_mode(game); // fullscreen not worky wah
             break;
+          case SDLK_F8:
+            free_menu(&current);
+            current = get_menu(game->renderer, SCREEN_MAIN_MENU);
+            break;
+          case SDLK_F10:
+            free_menu(&current);
+            current = get_menu(game->renderer, SCREEN_OPTIONS);
+            break;
       }
     }
   
@@ -106,12 +99,13 @@ void render(game* game) {
   for (int y = 0; y < BASE_HEIGHT/16; y++) {
     for (int x = 0; x < BASE_HEIGHT/16; x++) {
       if (x % 2 == 0) SDL_SetRenderDrawColor(game->renderer, 0, 255, 0, 255);
-      else      SDL_SetRenderDrawColor(game->renderer, 0, 0, 255, 255);
+      else            SDL_SetRenderDrawColor(game->renderer, 0, 0, 255, 255);
     
     SDL_FRect rect = {x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE};
     SDL_RenderFillRect(game->renderer, &rect);
     }
   }
+  
   // render the current menu
   render_menu(game->renderer, &current);
 }

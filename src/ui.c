@@ -18,14 +18,17 @@ SDL_Texture* create_tex(SDL_Renderer* r, char* path) {
   return t;
 }
 
+
 int on_button(button* b, float mx, float my) {
   return mx >= b->rect.x && mx <= b->rect.x + b->rect.w && my >= b->rect.y && my <= b->rect.y + b->rect.h;
 }
+
 
 void update_button_pos(button* b, float x, float y) {
   b->rect.x = x;
   b->rect.y = y;
 }
+
 
 void update_button_pos_relative(button* b, float x, float y) {
   b->rect.x += x;
@@ -33,35 +36,48 @@ void update_button_pos_relative(button* b, float x, float y) {
 }
 
 
+void init_screen(screen* s) {
+  s->current = 0;
+}
 
-void init_screen(screen* screen) {
+
+void add_menu_to_screen(screen* s, menu* m) {
   
 }
 
 
-void add_menu_to_screen(screen* screen, menu* menu) {
+void handle_screen_input(mouse_position* mpos, screen* s, SDL_Event* e) {
   
 }
 
 
-void handle_screen_input(mouse_position* mpos, screen* screen, SDL_Event* e) {
-  
+void render_screen(SDL_Renderer* r, screen* s) {
+  render_menu(r, s->menus[s->current]);
 }
 
 
-void render_screen(SDL_Renderer* r, screen* screen) {
+void destroy_screen(screen* s) {
   
 }
-
 
 
 void init_menu(menu* menu) {
   menu->count = 0;
   menu->current_selection = 0;
-  for (int i = 0; i < menu->count; i++) {
-    //menu->buttons[i] = 0;
-    SDL_Log("%d", i);
+}
+
+
+void free_menu(menu* src) {
+  if (!src) return;
+  
+  for (int i = 0; i < src->count; i++) {
+    if (src->buttons[i]->text)        free(src->buttons[i]->text);
+    if (src->buttons[i]->tex_default) SDL_DestroyTexture(src->buttons[i]->tex_default);
+    if (src->buttons[i]->tex_hovered) SDL_DestroyTexture(src->buttons[i]->tex_hovered);
+    if (src->buttons[i]->tex_clicked) SDL_DestroyTexture(src->buttons[i]->tex_clicked);
+    if (src->buttons[i])              free(src->buttons[i]);
   }
+  src = NULL; // necessary?
 }
 
 
@@ -78,6 +94,9 @@ void handle_menu_event(mouse_position* mpos, menu* menu, SDL_Event* e) {
       continue;
     }
     handle_button_event(mpos, menu->buttons[i], e);
+    // want to change this to
+    // for (int i = 0; i < menu->buttons.count; i++)
+    // menu->buttons[i].handle_event(mpos, e);
   }
 }
 
@@ -90,7 +109,6 @@ void render_menu(SDL_Renderer* r, menu* menu) {
     }
     render_button(r, menu->buttons[i]);
   }}
-
 
 
 void init_button(button* target, float x, float y, float w, float h, void (*callback)()) {
@@ -199,6 +217,7 @@ void render_button(SDL_Renderer* r, button* b) {
 
   if (b->text) {
     // add text to the button to be drawn here... i forgor how rn
+    // b->text added to a texture... add an applicable rect... render... ig...
   }
 }
 

@@ -6,8 +6,10 @@
 #include <SDL3_image/SDL_image.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
-// the ui has to 
+#include <stdlib.h>
+
 #include "window.h"
+
 
 #define MAX_MENU_BUTTONS 24
 
@@ -58,7 +60,7 @@ typedef struct screen screen;
 struct screen {
   menu* menus[SCREEN_NUM_OF];
   // the game ig
-  screen_id current;
+  screen_id current; 
 };
 
 /* on screens:
@@ -70,7 +72,7 @@ struct screen {
 
 /* helper functions */
 
-// helper to create textures easily; return NULL on failure
+// create texture from filepath; return NULL on failure
 SDL_Texture* create_texture(SDL_Renderer* r, char* path);
 
 // handles a single buttons event with regards to the mouse
@@ -83,19 +85,24 @@ void update_button_pos_relative(button* b, float x, float y);
 
 /* screen functions */
 
-void init_screen(screen* screen);
+void init_screen(screen* s);
 
-void add_menu_to_screen(screen* screen, menu* menu);
+void add_menu_to_screen(screen* s, menu* m);
 
-void handle_screen_input(mouse_position* mpos, screen* screen, SDL_Event* e);
+void handle_screen_input(mouse_position* mpos, screen* s, SDL_Event* e);
 
-void render_screen(SDL_Renderer* r, screen* screen);
+void render_screen(SDL_Renderer* r, screen* s);
+
+void destroy_screen(screen* s);
 
 
 /* menu functions */
 
 // create a menu to store buttons
 void init_menu(menu* menu);
+
+// frees all buttons present in a menu
+void free_menu(menu* src); 
 
 // append a button to the given menu
 void add_button_to_menu(menu* menu, button* b);
