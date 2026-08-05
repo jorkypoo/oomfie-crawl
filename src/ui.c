@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL_timer.h>
 
+/* helper shit */
 
 SDL_Texture* create_tex(SDL_Renderer* r, char* path) {
   SDL_Surface* s = NULL;
@@ -19,157 +20,242 @@ SDL_Texture* create_tex(SDL_Renderer* r, char* path) {
 }
 
 
-int on_button(button* b, float mx, float my) {
+int on_button(Button* b, float mx, float my) {
   return mx >= b->rect.x && mx <= b->rect.x + b->rect.w && my >= b->rect.y && my <= b->rect.y + b->rect.h;
 }
 
 
-void update_button_pos(button* b, float x, float y) {
+void update_button_pos(Button* b, float x, float y) {
   b->rect.x = x;
   b->rect.y = y;
 }
 
 
-void update_button_pos_relative(button* b, float x, float y) {
+void update_button_pos_relative(Button* b, float x, float y) {
   b->rect.x += x;
   b->rect.y += y;
 }
 
+/* screen shit */
+// PLSSSS ALSO DOOOOOOOoooOOOoOOOoOOOOOOoooOOO THIIIIIIIIIIIIIiiiiIIiIIIIIISSSSSSSSSSssssss
 
-void init_screen(screen* s) {
-  ;
+Screen* init_screen(Menu* m) {
+  Screen* dest = malloc(sizeof(Screen));
+  if (!dest) {
+    free_menu(m);
+    return NULL;
+  }
+
+  dest->current_menu = m;
+  return dest;
 }
 
 
-void update_screen_current_menu(screen* s, menu* m) {
-  ;
+void free_screen(Screen* s) {
+  if (!s) return;
+
+  free_menu(s->current_menu);
+  free(s);
 }
 
 
-void handle_screen_input(mouse_position* mpos, screen* s, SDL_Event* e) {
+int update_screen_current_menu(Screen* s, Menu* m) {
+  if (!s || !m) return 0;
+
+  if (s->current_menu != m) {
+    free_menu(s->current_menu);
+  }
+
+  s->current_menu = m;
+  return 1;
+}
+
+
+void handle_screen_input(mouse_position* mpos, Screen* s, SDL_Event* e) {
   handle_menu_event(mpos, s->current_menu, e);
 }
 
 
-void render_screen(SDL_Renderer* r, screen* s) {
+void render_screen(SDL_Renderer* r, Screen* s) {
   render_menu(r, s->current_menu);
 }
 
 
-void destroy_screen(screen* s) {
-  ;
+/* menu shit */
+// PLS OD THIS NOWWWWWWWWWWWWWw@@WWWWWWWWWWWWWWWWWW
+
+Menu* init_menu() {
+  Menu* dest = malloc(sizeof(Menu));
+  if (!dest) return NULL;
+  
+  dest->count = 0;
+  dest->current_selection = 0;
+
+  return dest;
 }
 
 
-void init_menu(menu* menu) {
-  menu->count = 0;
-  menu->current_selection = 0;
-}
-
-
-void free_menu(menu* src) {
+void free_menu(Menu* src) {
   if (!src) return;
   
   for (int i = 0; i < src->count; i++) {
-    if (src->buttons[i]->text)        free(src->buttons[i]->text);
-    if (src->buttons[i]->tex_default) SDL_DestroyTexture(src->buttons[i]->tex_default);
-    if (src->buttons[i]->tex_hovered) SDL_DestroyTexture(src->buttons[i]->tex_hovered);
-    if (src->buttons[i]->tex_clicked) SDL_DestroyTexture(src->buttons[i]->tex_clicked);
-    if (src->buttons[i])              free(src->buttons[i]);
+    if (src->buttons[i])
+      free_button(src->buttons[i]);
   }
-  src = NULL; // necessary?
+  free(src);
 }
 
 
-void add_button_to_menu(menu* menu, button* b) {
-  if (menu->count > MAX_MENU_BUTTONS) return;
+int add_button_to_menu(Menu* menu, Button* b) {
+  if (!menu || !b) return 0;
+  
+  if (menu->count > MAX_MENU_BUTTONS) return 0;
   menu->buttons[menu->count++] = b;
+  return 1;
 }
 
 
-void handle_menu_event(mouse_position* mpos, menu* menu, SDL_Event* e) {
+void handle_menu_event(mouse_position* mpos, Menu* menu, SDL_Event* e) {
+  if (!menu) return;
+  //SDL_Log("1");
+  
   for (int i = 0; i < menu->count; i++) {
     if (!menu->buttons[i]) { // just incase
       SDL_Log("warning! button no. %d in menu is...invalid?", i);
       continue;
     }
-    //handle_button_event(mpos, menu->buttons[i], e);
-    menu->buttons[i]->handle_event(mpos, menu->buttons[i], e);
+    handle_button_event(mpos, menu->buttons[i], e);
+    //menu->buttons[i]->handle_event(mpos, menu->buttons[i], e);
   }
 }
 
 
-void render_menu(SDL_Renderer* r, menu* menu) {
+void render_menu(SDL_Renderer* r, Menu* menu) {
+  if (!r || !menu) return;
+
   for (int i = 0; i < menu->count; i++) {
     if (!menu->buttons[i]) { 
       SDL_Log("warning! button no. %d in menu is...invalid?", i);
       continue;
     }
-    //render_button(r, menu->buttons[i]);
-    menu->buttons[i]->render(r, menu->buttons[i]);
+    render_button(r, menu->buttons[i]);
+    //menu->buttons[i]->render(r, menu->buttons[i]);
   }
 }
 
 
-void init_button(button* target, float x, float y, float w, float h,\
-                 void (*callback)(void* callback_data), void* userdata) {
+/* button shit */
 
-  target->hovered = 0;
-  target->clicked = 0;
+Button* init_button(float x, float y, float w, float h, void (*callback)(void* callback_data), void* userdata) {
+  Button* dest = malloc(sizeof(Button));
+  if (!dest) {
+    return NULL;
+  }
+
+  dest->hovered = 0;
+  dest->clicked = 0;
   SDL_FRect r = {x, y, w, h};
-  target->rect = r;
+  dest->rect = r;
 
-  target->callback = callback;
-  target->handle_event = handle_button_event;
-  target->render = render_button;
+  dest->callback = callback;
+  dest->userdata = userdata;
 
-  target->userdata = userdata;
+  dest->tex_default = NULL;
+  dest->tex_hovered = NULL;
+  dest->tex_clicked = NULL;
 
-  target->tex_default = NURUPO;
-  target->tex_hovered = NURUPO;
-  target->tex_clicked = NURUPO;
-  target->text = NURUPO;
-  target->text_len = 0;
+  // temporary... maybs
+  dest->text = malloc(sizeof(char));
+  dest->text_len = 0;
+
+  return dest;
 }
 
 
-void init_button_textures(SDL_Renderer* r, button* target, char* def_path, char* hov_path, char* clk_path) {
-  SDL_Texture* t = NURUPO;
+int init_button_textures(SDL_Renderer* r, Button* target, char* def_path, char* hov_path, char* clk_path) {
+  if (!r) {
+    SDL_Log("error: invalid renderer");
+    return 0;
+  }
+
+  if (!target) {
+    SDL_Log("error: invalid button when assigning texture");
+    return 0;
+  }
+  
+  SDL_Texture* t;
   if (def_path) {
     t = create_tex(r, def_path);
 
-    if (!t) SDL_Log("error: could not create texture from file %s", def_path);
-    else target->tex_default = t;
+    if (!t) { 
+      SDL_Log("error: could not create default button texture from file %s", def_path);
+      return 0;
+    } else {
+      target->tex_default = t;
+    }
+  } else {
+    SDL_Log("error: define at least def_path when creating textured button");
+    return 0;
   }
   
   if (!hov_path) { // there is no hovered texture; use default tex
-    if (t) target->tex_hovered = t;
-  } else {
+    if (t) {
+      target->tex_hovered = t;
+    }
+  } else { // create texture from hov_path
     t = create_tex(r, hov_path);
 
-    if (!t) SDL_Log("error: could not create texture from file %s", hov_path);
-    else target->tex_hovered = t;
+    if (!t) { 
+      SDL_Log("error: could not create texture from file %s", hov_path);
+      return 0;
+    } else {
+      target->tex_hovered = t; 
+    }
   }
 
   if (!clk_path) { // there is no clicked texture; use default tex
-    if (t) target->tex_clicked = t;
-  } else {
+    if (t) { 
+      target->tex_clicked = t;
+    }
+  } else { // create texture from clk_path
     t = create_tex(r, clk_path);
 
-    if (!t) SDL_Log("error: could not create texture from file %s", clk_path);
-    else target->tex_clicked = t;
+    if (!t) {
+      SDL_Log("error: could not create texture from file %s", clk_path);
+      return 0;
+    } else {
+      target->tex_clicked = t;
+    }
   }
+  return 1;
 }
 
 
-void init_button_text(SDL_Renderer* r, button* target, char* text) {
-  if (!r || !target || !text) return;
+int init_button_text(SDL_Renderer* r, Button* target, char* text) {
+  if (!r || !target || !text) return 0;
 
   SDL_Log("init_button_text function not implemented yet");
+  return 0; // temporary until implemented
 }
 
 
-void handle_button_event(mouse_position* mpos, button* b, SDL_Event* event) {
+void free_button(Button* b) {
+  if (!b) return;
+
+  // free(): invalid pointer... hmm
+  //if (b->text) free(b->text);
+
+  if (b->tex_default) SDL_DestroyTexture(b->tex_default);
+  if (b->tex_hovered) SDL_DestroyTexture(b->tex_hovered);
+  if (b->tex_clicked) SDL_DestroyTexture(b->tex_clicked);
+    
+  free(b);
+}
+
+
+void handle_button_event(mouse_position* mpos, Button* b, SDL_Event* event) {
+  if (!mpos || !b || !event) return;
+  
   b->hovered = on_button(b, mpos->x, mpos->y);
   
   switch (event->type) {
@@ -191,13 +277,9 @@ void handle_button_event(mouse_position* mpos, button* b, SDL_Event* event) {
 }
 
 
-void render_simple_button(SDL_Renderer* renderer, button* target, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
-  SDL_SetRenderDrawColor(renderer, r, g, b, a);
-  SDL_RenderFillRect(renderer, &target->rect);
-}
+void render_button(SDL_Renderer* r, Button* b) {
+  if (!r || !b) return;
 
-
-void render_button(SDL_Renderer* r, button* b) {
   if (b->clicked) {
     if (b->tex_clicked)
       SDL_RenderTexture(r, b->tex_clicked, NULL, &b->rect);
@@ -228,4 +310,12 @@ void render_button(SDL_Renderer* r, button* b) {
   }
 }
 
+void render_simple_button(SDL_Renderer* renderer, Button* target, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+  if (!renderer || !target) {
+    return;
+  }
+  
+  SDL_SetRenderDrawColor(renderer, r, g, b, a);
+  SDL_RenderFillRect(renderer, &target->rect);
+}
 

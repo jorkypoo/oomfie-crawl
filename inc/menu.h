@@ -29,10 +29,10 @@ typedef enum {
 
 
 // returns a menu object
-menu get_main_menu(SDL_Renderer* renderer);
-menu get_options_menu(SDL_Renderer* renderer);
+Menu* get_main_menu(SDL_Renderer* renderer);
+Menu* get_options_menu(SDL_Renderer* renderer);
 
 // general menu grabbing thingy
-menu get_menu(SDL_Renderer* r, screen_id choice);
+Menu* get_menu(SDL_Renderer* r, screen_id choice);
 
 #endif

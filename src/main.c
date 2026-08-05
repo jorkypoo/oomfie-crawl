@@ -8,8 +8,8 @@ void update(game* game);
 void render(game* game);
 
 
-menu current;
-//screen scrn = {0};
+Menu* menu = NULL;
+Screen* screen = NULL;
 
 
 int main(int argc, char* argv[]) {
@@ -19,12 +19,8 @@ int main(int argc, char* argv[]) {
     return 1;
   }
 
-  //init_screen(&scrn);
-  //scrn.current_menu = get_menu(game.renderer, 0);
-  current = get_menu(game.renderer, 0);
-
-  /*SDL_Log("%f,%f\n%f,%f", current.buttons[0]->rect.x, current.buttons[0]->rect.y,\
-                          current.buttons[1]->rect.x, current.buttons[1]->rect.y); */
+  menu = get_menu(game.renderer, 0);
+  screen = init_screen(menu);
 
   while (game.running) {
     input(&game);
@@ -38,8 +34,7 @@ int main(int argc, char* argv[]) {
     // fps shit
     SDL_Delay(15/1000);
   }
-  //free_menu(&scrn.current_menu);
-  free_menu(&current);
+  free_screen(screen);
   quit_game(&game);
   return 0;
 }
@@ -51,6 +46,7 @@ void input(game *game) {
   char* current_res = get_current_game_resolution(game);
   get_scaled_mouse_coords(game);
 
+  Menu* tmp = NULL;
   while (SDL_PollEvent(&e)) {
     
     switch (e.type) {
@@ -80,23 +76,28 @@ void input(game *game) {
             // toggle_fullscreen_mode(game); // fullscreen not worky wah
             break;
           case SDLK_F8:
-            //free_menu(&scrn.current_menu);
-            //scrn.current_menu = get_menu(game->renderer, 0);
-            free_menu(&current);
-            current = get_menu(game->renderer, 0);
+            tmp = get_menu(game->renderer, 0);
+            if (!tmp)
+              break;
+            
+            if (!update_screen_current_menu(screen, tmp))
+              SDL_Log("error switching menus");
+
             break;
           case SDLK_F10:
-            //free_menu(&scrn.current_menu);
-            //scrn.current_menu = get_menu(game->renderer, 1);
-            free_menu(&current);
-            current = get_menu(game->renderer, 1);
+            tmp = get_menu(game->renderer, 1);
+            if (!tmp)
+              break;
+            
+            if (!update_screen_current_menu(screen, tmp))
+              SDL_Log("error switching menus");
+
             break;
-      }
+        }
     }
   
   // handle input RE current menu
-  handle_menu_event(&game->mouse_pos, &current, &e);
-  //handle_screen_input(&game->mouse_pos, &scrn, &e);
+  handle_screen_input(&game->mouse_pos, screen, &e);
   }
 }
 
@@ -114,6 +115,5 @@ void render(game* game) {
   }
   
   // render the current menu
-  render_menu(game->renderer, &current);
-  //render_screen(game->renderer, &scrn);
+  render_screen(game->renderer, screen);
 }
