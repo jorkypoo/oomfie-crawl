@@ -25,11 +25,11 @@ int main(int argc, char* argv[]) {
   while (game.running) {
     input(&game);
 
-    init_rendering(&game);
+    init_rendering(&game); // this function is engine code and must be called before user defined rendering
+    
     render(&game);
 
-    //SDL_Log("%f, %f", current.buttons[0]->rect.x, current.buttons[1]->rect.x);
-    upscale_game(&game);
+    upscale_game(&game); // engine code to be called after rendering code
 
     // fps shit
     SDL_Delay(15/1000);

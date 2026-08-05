@@ -14,3 +14,4 @@ TODO:
   - allow for button callbacks to update Screen 
   - create a base "element" struct which different ui elements inherit from
   - allows for menus to be made up of textboxes, bars, textures and buttons
+  - create a filesystem helper library to be a part of the engine. why not.
