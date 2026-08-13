@@ -11,6 +11,7 @@ void render(Application* game);
 // menu is later handed off to the screen
 Menu* menu = NULL;
 Screen* screen = NULL;
+Application app = { 0 };
 
 
 int main(int argc, char* argv[]) {
@@ -18,7 +19,6 @@ int main(int argc, char* argv[]) {
   // testing out some stuff for filesystem management 
   //list_dir_alpha_sorted(".", SORT_DESCENDING);
 
-  Application app = { 0 }; 
     if (!init_game(&app)) { 
     return 1;
   }
@@ -46,9 +46,12 @@ int main(int argc, char* argv[]) {
 
 void input(Application *app) {
   SDL_Event e;
-  
+
   char* current_res = get_current_game_resolution(app);
   get_scaled_mouse_coords(app);
+
+  // handle possible screen changes
+  handle_screen_updates(screen);
 
   Menu* tmp = NULL;
   while (SDL_PollEvent(&e)) {

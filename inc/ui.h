@@ -17,12 +17,11 @@
 
 
 // kinda changing this halfway through so buttons and text boxes inherit from element
-// and menus are collections of
+// and menus are collections of elements
+// will be implemented soon
 typedef struct Element Element;
 struct Element {
   SDL_FRect rect;
-
-  
 };
 
 
@@ -69,6 +68,15 @@ typedef struct Screen Screen;
 struct Screen {
   //Game* current_game;
   Menu* current_menu;
+
+  // kinda internal use
+  // cur_menu & cur_game can be set by button callbacks
+  // if the cur & prv don't match, update the menu
+  // kinda to be used by the user too
+  int cur_menu;
+  int prv_menu;
+  int cur_game;
+  int prv_game;
 };
 
 
@@ -96,6 +104,11 @@ int update_screen_current_menu(Screen* s, Menu* m);
 void handle_screen_input(mouse_position* mpos, Screen* s, SDL_Event* e);
 
 void render_screen(SDL_Renderer* r, Screen* s);
+
+
+// kinda lazy but needed for button callbacks being able to change the screen
+int should_change_screen_menu(Screen* s);
+int should_change_screen_game(Screen* s);
 
 
 /* ===== menu functions ===== */

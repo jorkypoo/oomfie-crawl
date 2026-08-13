@@ -7,22 +7,22 @@
 
 
 void* callback1 = 0;
-void test_btn_text(void* userdata) { 
-  SDL_Log("hi from textured button"); 
+void change_menu_to_options(void* userdata) { 
+  screen->cur_menu = 1;
 }
 
 
 Menu* get_main_menu(SDL_Renderer* renderer) {
   if (!renderer) return NULL;  
 
-  Button* tb1 = init_button(480, 0, 80, 48, test_btn_text, callback1);
+  Button* tb1 = init_button(480, 0, 80, 48, change_menu_to_options, NULL);
   if (!tb1)
     return NULL;
 
   if (!init_button_textures(renderer, tb1, BTN_PATH, BTN_PATH2, NULL))
     return NULL;
 
-  Button* tb2 = init_button(560, 0, 80, 48, test_btn_text, callback1);
+  Button* tb2 = init_button(560, 0, 80, 48, change_menu_to_options, NULL);
   if (!tb2)
     return NULL;
   
@@ -44,18 +44,18 @@ Menu* get_main_menu(SDL_Renderer* renderer) {
 
 
 void* callback2 = 0;
-void test_btn_func(void* userdata) { 
-  SDL_Log("hi from button"); 
+void change_menu_to_mainmenu(void* userdata) { 
+  screen->cur_menu = 0;
 }
 
 
 Menu* get_options_menu(SDL_Renderer* renderer) {
   if (!renderer) return NULL;  
 
-  Button* tb1 = init_button(MENU_L_BOUND, 0, MENU_WIDTH, 32, test_btn_func, callback2);
+  Button* tb1 = init_button(MENU_L_BOUND, 0, MENU_WIDTH, 32, change_menu_to_mainmenu, NULL);
   if (!tb1) return NULL;
 
-  Button* tb2 = init_button(MENU_L_BOUND, 32, MENU_WIDTH, 32, test_btn_func, callback2);
+  Button* tb2 = init_button(MENU_L_BOUND, 32, MENU_WIDTH, 32, change_menu_to_mainmenu, NULL);
   if (!tb2) return NULL;
   
   Menu* dest = init_menu();
@@ -83,3 +83,22 @@ Menu* get_menu(SDL_Renderer* r, screen_id choice) {
   return ret;
 }
 
+
+void handle_screen_updates(Screen* screen) {
+  Menu* tmp_menu = NULL;
+  //Game* tmp_game = NULL;
+  if (should_change_screen_menu(screen)) {
+    tmp_menu = get_menu(app.renderer, screen->cur_menu);
+    if (!tmp_menu) SDL_Log("error switching menus");
+
+    if (!update_screen_current_menu(screen, tmp_menu)) {
+      SDL_Log("error updating screen menu");
+    }
+    SDL_Log("successfully switched menu to %d", screen->cur_menu);
+  }
+
+  if (should_change_screen_game(screen)) {
+    ;
+  }
+  
+}

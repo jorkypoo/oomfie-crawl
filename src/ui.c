@@ -47,6 +47,13 @@ Screen* init_screen(Menu* m) {
   }
 
   dest->current_menu = m;
+  //dest->current_game = g;
+
+  dest->cur_menu = 0;
+  dest->prv_menu = 0;
+
+  dest->cur_game= 0;
+  dest->prv_game = 0;
   return dest;
 }
 
@@ -78,6 +85,23 @@ void handle_screen_input(mouse_position* mpos, Screen* s, SDL_Event* e) {
 
 void render_screen(SDL_Renderer* r, Screen* s) {
   render_menu(r, s->current_menu);
+}
+
+
+int should_change_screen_menu(Screen* s) {
+  if (s->cur_menu != s->prv_menu) {
+    s->prv_menu = s->cur_menu;
+    return 1;
+  }
+  return 0;
+}
+
+int should_change_screen_game(Screen* s) {
+  if (s->cur_game != s->prv_menu) {
+    s->prv_game = s->cur_game;
+    return 1;
+  }
+  return 0;
 }
 
 

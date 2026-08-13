@@ -6,7 +6,7 @@
  * perhaps by some state/ui manager?? idk
  * each menu will be custom made in this c file for now
  *
- * this file also doesn't represent engine code--it uses the engine to add menus
+ * this file also doesn't represent engine code -it uses the engine to add menus
  */
 
 #include "window.h"
@@ -27,6 +27,10 @@ typedef enum {
   SCREEN_NUM_OF,
 } screen_id;
 
+extern Screen* screen;
+extern Application app;
+
+
 
 // returns a menu object
 Menu* get_main_menu(SDL_Renderer* renderer);
@@ -34,5 +38,8 @@ Menu* get_options_menu(SDL_Renderer* renderer);
 
 // general menu grabbing thingy
 Menu* get_menu(SDL_Renderer* r, screen_id choice);
+
+// ugh kinda lazy to be here
+void handle_screen_updates(Screen* screen);
 
 #endif
