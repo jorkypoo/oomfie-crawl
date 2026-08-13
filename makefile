@@ -28,4 +28,5 @@ purge:
 # this uhhh... uhmmm......
 # compiles all .c files in SRC into .o files
 obj/%.o: src/%.c 
+	@mkdir -p obj/
 	$(CC) $(CFLAGS) -c $< -o $@
