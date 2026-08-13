@@ -8,7 +8,7 @@ resolution resolutions[] = {
 };
 
 
-void get_scaled_mouse_coords(game* game) {
+void get_scaled_mouse_coords(Application* game) {
   float scale;
   if (game->width / BASE_WIDTH < game->height / BASE_HEIGHT) 
     scale = game->width / BASE_WIDTH;
@@ -25,13 +25,13 @@ void get_scaled_mouse_coords(game* game) {
 }
 
 
-void get_game_scale(game* game, float* sx, float* sy) {
+void get_game_scale(Application* game, float* sx, float* sy) {
   *sx = BASE_WIDTH / game->width;
   *sy = BASE_HEIGHT / game->height;
 }
 
 
-void set_game_resolution(game *game, int w, int h) {
+void set_game_resolution(Application* game, int w, int h) {
   game->width = w;
   game->height = h;
 
@@ -39,12 +39,12 @@ void set_game_resolution(game *game, int w, int h) {
 }
 
 
-char* get_current_game_resolution(game *game) {
+char* get_current_game_resolution(Application* game) {
   return resolutions[game->resolution].name;
 }
 
 
-char* scroll_game_resolutions(game *game) {
+char* scroll_game_resolutions(Application* game) {
   game->resolution++;
   if (game->resolution >= SDL_arraysize(resolutions)) { game->resolution = 0; } 
   
@@ -54,13 +54,13 @@ char* scroll_game_resolutions(game *game) {
 }
 
 
-void toggle_borderless_mode(game *game) {
+void toggle_borderless_mode(Application* game) {
   SDL_SetWindowFullscreen(game->window, !game->borderless);
   game->borderless = !game->borderless;
 }
 
 
-void toggle_fullscreen_mode(game *game) { // this shit does not work
+void toggle_fullscreen_mode(Application* game) { // this shit does not work
   // grab users display settings
   SDL_DisplayID disp = SDL_GetDisplayForWindow(game->window);
   const SDL_DisplayMode *cur = SDL_GetCurrentDisplayMode(disp);
@@ -87,7 +87,7 @@ void toggle_fullscreen_mode(game *game) { // this shit does not work
 }
 
 
-int init_game(game *game) {
+int init_game(Application* game) {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     SDL_Log("SDL_Init failed: %s", SDL_GetError());
     return false;
@@ -128,7 +128,7 @@ int init_game(game *game) {
 }
 
 
-void quit_game(game *game) {
+void quit_game(Application* game) {
   SDL_DestroyTexture(game->game_texture);
   SDL_DestroyRenderer(game->renderer);
   SDL_DestroyWindow(game->window);
@@ -136,7 +136,7 @@ void quit_game(game *game) {
 }
 
 
-void init_rendering(game *game) {
+void init_rendering(Application* game) {
   SDL_SetRenderTarget(game->renderer, game->game_texture);
   SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255);
   SDL_RenderClear(game->renderer);
@@ -144,7 +144,7 @@ void init_rendering(game *game) {
 }
 
 
-void upscale_game(game *game) {
+void upscale_game(Application* game) {
   SDL_SetRenderTarget(game->renderer, NULL);
   
   float sx = game->width / BASE_WIDTH;

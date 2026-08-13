@@ -16,6 +16,16 @@
 #define MAX_MENU_BUTTONS 24
 
 
+// kinda changing this halfway through so buttons and text boxes inherit from element
+// and menus are collections of
+typedef struct Element Element;
+struct Element {
+  SDL_FRect rect;
+
+  
+};
+
+
 typedef struct Button Button;
 struct Button {
   SDL_FRect rect;
@@ -54,9 +64,10 @@ struct Menu {
 
 // screen is the object that the user operates with
 // but they will need to make and work with their own menus
-// however, once passed to the screen
+// however, once passed to the screen, the menu will be taken care of
 typedef struct Screen Screen;
 struct Screen {
+  //Game* current_game;
   Menu* current_menu;
 };
 

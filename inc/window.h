@@ -20,7 +20,10 @@ struct resolution {
 };
 
 // must modify this in window.c soz i might be retarded
+// defines all the available resolutions the game can change to
 extern resolution resolutions[];
+
+// N.B. App struct was previously called Game lolsies
 
 
 typedef struct mouse_position mouse_position;
@@ -29,13 +32,13 @@ struct mouse_position {
   float y;
 };
 
-typedef struct game game;
-struct game {
-  SDL_Window   *window;
-  SDL_Renderer *renderer;
-  SDL_Texture  *game_texture;
+typedef struct Application Application;
+struct Application {
+  SDL_Window*   window;
+  SDL_Renderer* renderer;
+  SDL_Texture*  game_texture;
 
-  // window dimensions -- set to and kept at BASE_WIDTH & HEIGHT in init()
+  // window dimensions - set to and kept at BASE_WIDTH & HEIGHT in init()
   // the game is upscaled later so game logic should be written in terms of those macros 
   float width;
   float height;
@@ -51,38 +54,38 @@ struct game {
 
 
 // grab the mouse coordinates and scale them for use in-game
-void get_scaled_mouse_coords(game* game);
+void get_scaled_mouse_coords(Application* game);
 
 // update the scale factor for every button... idk its for ui
-void get_game_scale(game* game, float* sx, float* sy);
+void get_game_scale(Application* game, float* sx, float* sy);
 
 // used indirectly inside scroll_game_resolutions()
-void set_game_resolution(game *game, int w, int h);
+void set_game_resolution(Application* game, int w, int h);
 
 // returns games current resolution for displaying ig; something like "600x400"
-char* get_current_game_resolution(game *game);
+char* get_current_game_resolution(Application* game);
 
 // used in a menu or whatever; scrolls through available screen resolutions
 // also returns games current resolution
-char* scroll_game_resolutions(game *game);
+char* scroll_game_resolutions(Application* game);
 
 // toggles between windowed & fullscreen borderless mode
-void toggle_borderless_mode(game *game);
+void toggle_borderless_mode(Application* game);
 
 // currently not working, but should force display to be whatever the selected game resolution is
-void toggle_fullscreen_mode(game *game);
+void toggle_fullscreen_mode(Application* game);
 
 // initialises SDL and everything and returns a game object
-int init_game(game *game); 
+int init_game(Application* game); 
 
 // cleanup
-void quit_game(game *game);
+void quit_game(Application* game);
 
 // wrapper to set the rendering target to the game texture
-void init_rendering(game *game); // MUST BE CALLED BEFORE CUSTOM RENDERING CODE
+void init_rendering(Application* game); // MUST BE CALLED BEFORE CUSTOM RENDERING CODE
 
 // scales game window up based on currently selected resolution
 // helps maintain game & ui logic at the base window dimensions
-void upscale_game(game *game); // MUST BE CALLED AFTER CUSTOM RENDERING CODE
+void upscale_game(Application* game); // MUST BE CALLED AFTER CUSTOM RENDERING CODE
 
 #endif

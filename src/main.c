@@ -1,82 +1,86 @@
 #include "../inc/window.h"
 #include "../inc/ui.h"
 #include "../inc/menu.h"
+#include "../inc/filesystem.h"
 
 // basic sdl frame loop functions
-void input(game* game);
-void update(game* game);
-void render(game* game);
+void input(Application* game);
+void update(Application* game);
+void render(Application* game);
 
-
+// menu is later handed off to the screen
 Menu* menu = NULL;
 Screen* screen = NULL;
 
 
 int main(int argc, char* argv[]) {
 
-  game game = { 0 }; 
-    if (!init_game(&game)) { 
+  // testing out some stuff for filesystem management 
+  //list_dir_alpha_sorted(".", SORT_DESCENDING);
+
+  Application app = { 0 }; 
+    if (!init_game(&app)) { 
     return 1;
   }
 
-  menu = get_menu(game.renderer, 0);
+  menu = get_menu(app.renderer, 0);
   screen = init_screen(menu);
 
-  while (game.running) {
-    input(&game);
+  while (app.running) {
+    input(&app);
 
-    init_rendering(&game); // this function is engine code and must be called before user defined rendering
+    init_rendering(&app); // this function is engine code and must be called before user defined rendering
     
-    render(&game);
+    render(&app);
 
-    upscale_game(&game); // engine code to be called after rendering code
+    upscale_game(&app); // engine code to be called after rendering code
 
     // fps shit
     SDL_Delay(15/1000);
   }
   free_screen(screen);
-  quit_game(&game);
+  quit_game(&app);
   return 0;
 }
 
 
-void input(game *game) {
+void input(Application *app) {
   SDL_Event e;
   
-  char* current_res = get_current_game_resolution(game);
-  get_scaled_mouse_coords(game);
+  char* current_res = get_current_game_resolution(app);
+  get_scaled_mouse_coords(app);
 
   Menu* tmp = NULL;
   while (SDL_PollEvent(&e)) {
     
     switch (e.type) {
       case SDL_EVENT_QUIT:
-        game->running = 0;
+        app->running = 0;
         break;
 
       case SDL_EVENT_WINDOW_RESIZED:
-        game->width = e.window.data1;
-        game->height = e.window.data2;        
+        app->width = e.window.data1;
+        app->height = e.window.data2;        
         break;
 
       case SDL_EVENT_KEY_DOWN:
         switch (e.key.key) {
           case SDLK_ESCAPE:
-            game->running = 0;
+            app->running = 0;
             break;
           case SDLK_F1:
-            if (game->borderless) break;
-            current_res = scroll_game_resolutions(game);
+            if (app->borderless) break;
+            current_res = scroll_game_resolutions(app);
             //SDL_Log("%s", current_res);
             break;
           case SDLK_F2:
-            toggle_borderless_mode(game);
+            toggle_borderless_mode(app);
             break;
           case SDLK_F3:
             // toggle_fullscreen_mode(game); // fullscreen not worky wah
             break;
           case SDLK_F8:
-            tmp = get_menu(game->renderer, 0);
+            tmp = get_menu(app->renderer, 0);
             if (!tmp)
               break;
             
@@ -85,7 +89,7 @@ void input(game *game) {
 
             break;
           case SDLK_F10:
-            tmp = get_menu(game->renderer, 1);
+            tmp = get_menu(app->renderer, 1);
             if (!tmp)
               break;
             
@@ -97,23 +101,23 @@ void input(game *game) {
     }
   
   // handle input RE current menu
-  handle_screen_input(&game->mouse_pos, screen, &e);
+  handle_screen_input(&app->mouse_pos, screen, &e);
   }
 }
 
 
-void render(game* game) {
+void render(Application* app) {
   // rendering a cheeky sample map
   for (int y = 0; y < BASE_HEIGHT/16; y++) {
     for (int x = 0; x < BASE_HEIGHT/16; x++) {
-      if (x % 2 == 0) SDL_SetRenderDrawColor(game->renderer, 0, 255, 0, 255);
-      else            SDL_SetRenderDrawColor(game->renderer, 0, 0, 255, 255);
+      if (x % 2 == 0) SDL_SetRenderDrawColor(app->renderer, 0, 255, 0, 255);
+      else            SDL_SetRenderDrawColor(app->renderer, 0, 0, 255, 255);
     
     SDL_FRect rect = {x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE};
-    SDL_RenderFillRect(game->renderer, &rect);
+    SDL_RenderFillRect(app->renderer, &rect);
     }
   }
   
   // render the current menu
-  render_screen(game->renderer, screen);
+  render_screen(app->renderer, screen);
 }
