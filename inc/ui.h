@@ -40,19 +40,21 @@ struct Button {
   SDL_Texture* tex_clicked;
 
   // and the text to be drawn on button
+  // not implemented yet
   char* text;
   size_t text_len;
   
   // callback function... duh
   void (*callback)(void* userdata); 
   
-  // data sent to the callback function for whatever use
+  // data used by the callback function for whatever 
   // assigned individually for each function
   void* userdata;
 }; 
 
 
 // a menu is made of buttons
+// soon to be elements
 typedef struct Menu Menu;
 struct Menu {
   Button* buttons[MAX_MENU_BUTTONS];
@@ -62,17 +64,16 @@ struct Menu {
 
 
 // screen is the object that the user operates with
-// but they will need to make and work with their own menus
+// but they will need to make their own menus inside a file or wtv
 // however, once passed to the screen, the menu will be taken care of
+// remember to free that initial menu
 typedef struct Screen Screen;
 struct Screen {
   //Game* current_game;
   Menu* current_menu;
 
-  // kinda internal use
-  // cur_menu & cur_game can be set by button callbacks
-  // if the cur & prv don't match, update the menu
-  // kinda to be used by the user too
+  // cur_menu and cur_game to be used by user; others for internal use
+  // cur_menu & cur_game can be set by button callbacks; just see menu.c, soz
   int cur_menu;
   int prv_menu;
   int cur_game;
@@ -95,14 +96,22 @@ void update_button_pos_relative(Button* b, float x, float y);
 
 /* ===== screen functions ===== */
 
+// init and return a menu
 Screen* init_screen(Menu* m);
 
+// free a screen and it's attached menu and game objects
 void free_screen(Screen* s);
 
+// updates a screen to use a new menu
 int update_screen_current_menu(Screen* s, Menu* m);
 
+// same as above
+// int update_screen_current_game(Screen* s. Game* g);
+
+// wrapper for handle_menu_input basically
 void handle_screen_input(mouse_position* mpos, Screen* s, SDL_Event* e);
 
+// wrapper for render_menu
 void render_screen(SDL_Renderer* r, Screen* s);
 
 
@@ -116,10 +125,13 @@ int should_change_screen_game(Screen* s);
 // create a menu to store buttons
 Menu* init_menu();
 
-// frees all buttons present in a menu
+// frees menu and all buttons present in it; leaves callers pointer dangling
+// mostly used internally but u may have to free ur initial menu after assigning
+// it to the Screen object 
 void free_menu(Menu* src); 
 
 // append a button to the given menu
+// order in which buttons are arranged in list does not matter
 int add_button_to_menu(Menu* menu, Button* b);
 
 // basically a wrapper got handle_button_event() that loops through all buttons
@@ -132,30 +144,29 @@ void render_menu(SDL_Renderer* r, Menu* menu);
 
 /* ===== button functions ===== */
 
-// PLSSSSSSSSSSSSSSsssssSSSSSSSSssSSSSSSSSSS MAKE THESE RETURN A BOOOOOOOOOOOooooOOOOooOooOOoOOOOOLLLlll
-
-// creates a basic button with callback based on given parameters
-// add a callback function with data it will access
-// just look at the examples, sorry (if i can get this working)
+// creates a basic button based on given parameters
+// add a callback function with user provided data can access
 Button* init_button(float x, float y, float w, float h,\
                  void (*callback)(void* callback_data), void* userdata);
 
 // adds textures to an existing button already initialised with init_button()
-// def(ault)_path must not be NULL; other paths that are NULL reuse def(ault)_path
+// def(ault)_path must not be NULL; other paths that are NULL will reuse def(ault)_path
 int init_button_textures(SDL_Renderer* r, Button* target,\
                           char* def_path, char* hov_path, char* clk_path);
 
 // add text to the button; NULL is ok
 int init_button_text(SDL_Renderer* r, Button* target, char* text);
 
+// frees existing textures and text 
 void free_button(Button* b);
 
-// called in input loop and activates buttons callback function if button clicked
+// handles button's callback function if button was clicked
 void handle_button_event(mouse_position* mpos, Button* b, SDL_Event* event);
 
-// render a button; if default texture is NULL, button will be rendered noticably red...
+// render a button with a texture, or a default colour, if no textures were added
 void render_button(SDL_Renderer* r, Button* b);
 
+// for internal use
 void render_simple_button(SDL_Renderer* renderer, Button* target, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 

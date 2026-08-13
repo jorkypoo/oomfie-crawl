@@ -6,7 +6,6 @@
 #define BTN_PATH2 "assets/button_pressed.png"
 
 
-void* callback1 = 0;
 void change_menu_to_options(void* userdata) { 
   screen->cur_menu = 1;
 }
@@ -94,7 +93,6 @@ void handle_screen_updates(Screen* screen) {
     if (!update_screen_current_menu(screen, tmp_menu)) {
       SDL_Log("error updating screen menu");
     }
-    SDL_Log("successfully switched menu to %d", screen->cur_menu);
   }
 
   if (should_change_screen_game(screen)) {
