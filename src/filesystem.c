@@ -80,6 +80,19 @@ size_t num_of_lines(char* src, size_t size) {
 }
 
 
+// shifts the chars in a string to the left by one n times
+// make sure the size accounts for the \0
+void str_shift (char* target, size_t size, int n) {
+  if (!target) return;
+
+  for (int i = 0; i < n; i++) {
+    for (size_t i = 1; i < size; i++) {
+      target[i - 1] = target[i];
+    }
+  }
+}
+
+
 char* get_delimited_value(char* src, char deliminator, int n) {
   ;
 }
@@ -163,27 +176,27 @@ char* get_line_match(char* path, char* match) {
 
   // prepare a buffer to hold one line of the file at a time
   size_t nlines = num_of_lines(buff, fsize + 1);
-  char* lbuf = malloc(1);
+  char* ret = malloc(1);
 
+  // characters to discard after shift: match_len + 1
   size_t match_len = strlen(match);
   if (match_len < 1) return NULL;
 
-  ;
+  size_t line_found = -1;
 
-  // loop through every line in the file and search for 
+  // loop through every line in the file and search for the match
   for (size_t i = 0; i < nlines; i++) {
-    lbuf = realloc(lbuf, strlen(get_line_from_str(buff, i)));
-    lbuf = get_line_from_str(buff, i);
-    //printf("%s\n", lbuf);
-    if (strncmp(lbuf, match, match_len) == 0) {
-      printf("found\n");
+    ret = realloc(ret, strlen(get_line_from_str(buff, i)));
+    ret = get_line_from_str(buff, i);
+    if (strncmp(ret, match, match_len) == 0) {
+      line_found = 0;
       break;
     }
-  }  
- 
-  char* ret = NULL;
+  }
 
+  // now filter out the match from the line, as that's included in what was found
+  str_shift(ret, strlen(ret) + 1, match_len + 1);
+ 
   free(buff);
-  free(lbuf);
   return ret;
 }

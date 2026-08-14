@@ -25,8 +25,8 @@ int main(int argc, char* argv[]) {
   if (tmp) free(tmp); // must free results from these functions
 
   char* tmp2 = get_line_match("btns", "poop");
-  if (tmp2) printf("%s\n", tmp2);
-  //if (tmp2) free(tmp2);
+  //if (tmp2) printf("%s\n", tmp2);
+  if (tmp2) free(tmp2); // ""
 
     if (!init_game(&app)) { 
     return 1;
