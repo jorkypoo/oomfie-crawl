@@ -93,8 +93,40 @@ void str_shift (char* target, size_t size, int n) {
 }
 
 
+// return value must be freed
 char* get_delimited_value(char* src, char deliminator, int n) {
-  ;
+  // n is basically how many deliminators we have to pass
+  // firstly, scan src to see how big the value is
+  size_t vsize = 0;
+  size_t delims_seen = 0;
+  for (size_t i = 0; i < strlen(src); i++) {
+    if (delims_seen == n) vsize++; // we are at the correct value in src, so count
+
+    if (src[i] == deliminator) { // skip the entry if it's the deliminator
+      if (delims_seen == n) vsize--; // don't count the deliminator in total size of value
+      delims_seen++;
+      continue; 
+    }
+  } delims_seen = 0; 
+
+  if (vsize < 1) return NULL; // caller was a retard
+  char* value = calloc(sizeof(char), vsize + 1);
+
+  size_t j = 0; // counter for value
+  for (size_t i = 0; i < strlen(src); i++) {
+    if (delims_seen == n) {
+      value[j] = src[i];
+      j++;
+    }
+
+    if (src[i] == deliminator) {
+      if (delims_seen == n) value[vsize] = '\0';
+      delims_seen++;
+      continue;
+    }
+  }
+
+  return value;
 }
 
 

@@ -26,9 +26,16 @@ int main(int argc, char* argv[]) {
 
   char* tmp2 = get_line_match("btns", "poop");
   //if (tmp2) printf("%s\n", tmp2);
-  if (tmp2) free(tmp2); // ""
 
-    if (!init_game(&app)) { 
+  char* tmp3 = get_delimited_value(tmp2, ',', 5);
+  //if (tmp3) printf("%s\n", tmp3);
+  if (tmp3) free(tmp3);
+  if (tmp2) free(tmp2); // again, returned by get_line_match and must free
+
+
+  /* above is just testing */
+
+  if (!init_game(&app)) { 
     return 1;
   }
 

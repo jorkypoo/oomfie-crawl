@@ -33,6 +33,7 @@ size_t num_of_lines(char* src, size_t size);
 void str_shift(char* src, size_t size, int n);
 
 // returns the nth delimited value from src, or NULL on failure
+// must free the returned value
 char* get_delimited_value(char* src, char delimiter, int n);
 
 // similar to get_line_offset, but works with a given string, because its a very good bit of code
