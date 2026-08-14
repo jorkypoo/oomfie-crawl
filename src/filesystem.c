@@ -67,3 +67,123 @@ void list_dir_alpha_sorted(char* path, Sort_Option option) {
 
   free(df);
 }
+
+
+size_t num_of_lines(char* src, size_t size) {
+  if (!src) return 0;
+  size_t num = 0;
+
+  for (size_t i = 0; i < size; i++)
+    if (src[i] == '\n') num++;
+
+  return num;
+}
+
+
+char* get_delimited_value(char* src, char deliminator, int n) {
+  ;
+}
+
+
+// must free return value
+char* get_line_from_str(char* src, size_t line) {
+  if (!src) return NULL;
+
+  size_t nlines = num_of_lines(src, strlen(src));
+  
+  int cursor = 0;
+  while (line) {
+    if (cursor >= strlen(src) - 1) return NULL; // if the offset does not exist, return NULL
+    if (src[cursor++] == '\n') line--;
+  }
+  
+  // calculate the lines size 
+  size_t lsize = 0;
+  for (size_t i = cursor; src[i] != '\n'; i++) lsize++;
+
+  // allocate return value and assign line to it
+  char *ret = calloc(sizeof(char), lsize + 1);
+  for (size_t i = 0; i < lsize; i++) ret[i] = src[i + cursor];
+
+  return ret;
+}
+
+
+// must free return value
+char* get_line_offset(char* path, size_t offset) {
+  if (!path) return NULL;
+  FILE* file = NULL;
+  file = fopen(path, "r");
+  if (!file) return NULL;
+  
+  // get size of file and dump contents into buffer
+  fseek(file, 0, SEEK_END);
+  size_t fsize = ftell(file);
+  rewind(file);
+  char* buff = calloc(sizeof(char), fsize + 1);
+  if (fread(buff, sizeof(char), fsize, file) < 1)
+    printf("error: could not read file %s", path);
+  fclose(file);
+ 
+  // move buffer cursor to the start of the specified line
+  // should not call segfault anymore
+  int cursor = 0;
+  while (offset) {
+    if (cursor >= fsize - 1) return NULL; // if the offset does not exist, return NULL
+    if (buff[cursor++] == '\n') offset--;
+  }
+  
+  // calculate the lines size 
+  size_t lsize = 0;
+  for (size_t i = cursor; buff[i] != '\n'; i++) lsize++;
+
+  // allocate return value and assign line to it
+  char *ret = calloc(sizeof(char), lsize + 1);
+  for (size_t i = 0; i < lsize; i++) ret[i] = buff[i + cursor];
+
+  free(buff);
+  return ret;
+}
+
+
+char* get_line_match(char* path, char* match) {
+  if (!path || !match) return NULL;
+  FILE* file = NULL;
+  file = fopen(path, "r");
+  if (!file) return NULL;
+  
+  // get size of file and dump contents into buffer
+  fseek(file, 0, SEEK_END);
+  size_t fsize = ftell(file);
+  rewind(file);
+  char* buff = calloc(sizeof(char), fsize + 1);
+  if (fread(buff, sizeof(char), fsize, file) < 1)
+    printf("error: could not read file %s", path);
+  fclose(file);
+
+  // prepare a buffer to hold one line of the file at a time
+  size_t nlines = num_of_lines(buff, fsize + 1);
+  char* lbuf = malloc(1);
+
+  size_t match_len = strlen(match);
+  if (match_len < 1) return NULL;
+
+  ;
+
+  // loop through every line in the file and search for 
+  for (size_t i = 0; i < nlines; i++) {
+    lbuf = realloc(lbuf, strlen(get_line_from_str(buff, i)));
+    lbuf = get_line_from_str(buff, i);
+    //printf("%s\n", lbuf);
+    if (strncmp(lbuf, match, match_len) == 0) {
+      printf("found\n");
+      break;
+    }
+  }  
+ 
+  char* ret = NULL;
+
+  free(buff);
+  free(lbuf);
+  return ret;
+}

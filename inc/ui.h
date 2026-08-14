@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include "window.h"
+#include "filesystem.h"
 
 /* this file represents engine code that the user should interface with - not modify */
 
@@ -27,6 +28,7 @@ struct Element {
 
 typedef struct Button Button;
 struct Button {
+  // Element base;
   SDL_FRect rect;
 
   // booleans for states of teh button
@@ -50,7 +52,28 @@ struct Button {
   // data used by the callback function for whatever 
   // assigned individually for each function
   void* userdata;
-}; 
+}; // ===== button struct
+
+
+typedef struct Textbox Textbox;
+struct Textbox {
+  Element base;
+
+  char* text;
+  size_t text_len;
+};
+
+
+typedef struct Input_Field Input_Field;
+struct Input_Field {
+  Element base;
+};
+
+
+typedef struct Progress_Bar Progress_Bar;
+struct Progress_Bar {
+  Element base;
+};
 
 
 // a menu is made of buttons
@@ -85,6 +108,9 @@ struct Screen {
 
 // create texture from filepath; return NULL on failure
 SDL_Texture* create_texture(SDL_Renderer* r, char* path);
+
+
+// these should update on Elements instead of buttons
 
 // returns 1 if mouse cursor is on a button; else 0
 int on_button(Button* b, float mx, float my);
@@ -153,6 +179,14 @@ Button* init_button(float x, float y, float w, float h,\
 // def(ault)_path must not be NULL; other paths that are NULL will reuse def(ault)_path
 int init_button_textures(SDL_Renderer* r, Button* target,\
                           char* def_path, char* hov_path, char* clk_path);
+
+/* button files will be standardized; see ... for an example */
+
+// initialises a button from a file; searches button file with an offset: 0 being first entry, etc
+Button* init_button_from_file_offset(char* path, int offset, void (*callback)(void* callback_data), void* userdata);
+
+// same as above, but searches for a string match. function above ignores any strings at the beginning of lines
+Button* init_button_from_file_match(char* path, char* match, void (*callback)(void* callback_data), void* userdata);
 
 // add text to the button; NULL is ok
 int init_button_text(SDL_Renderer* r, Button* target, char* text);
