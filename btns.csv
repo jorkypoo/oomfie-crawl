@@ -1,0 +1,5 @@
+480,0,80,48,assets/button_default.png,assets/button_pressed.png,0
+560,0,80,48,assets/button_default.png,assets/button_pressed.png
+480,48,160,64,test
+480,0,160,32
+480,32,160,32

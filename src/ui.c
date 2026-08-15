@@ -170,6 +170,100 @@ void render_menu(SDL_Renderer* r, Menu* menu) {
 
 /* button shit */
 
+
+Button* init_button_offset(SDL_Renderer* r, char* path, int offset, void(*callback)(void* callback_data), void* userdata) {
+  if (!path || !r) return NULL;
+  
+  // returns x,y,w,h,def_path,hov_path,clk_path
+  // where hov_path and clk_path can be omitted, or 0 - representing null
+  char* bs = get_line_offset(path, offset);
+  if (!bs) return NULL;
+  
+  float x = atof(get_delimited_value(bs, DELIMITER, 0));
+  float y = atof(get_delimited_value(bs, DELIMITER, 1));
+  float w = atof(get_delimited_value(bs, DELIMITER, 2));
+  float h = atof(get_delimited_value(bs, DELIMITER, 3));
+  Button* dest = init_button(x,y,w,h,callback,userdata);
+
+  // dpath must be defined; others can be empty or defined
+  char* dpath = get_delimited_value(bs, DELIMITER, 4);
+  if (!dpath) { // button path must not be shit
+      SDL_Log("default button path must be defined in %s", path);
+      return NULL;
+  }
+
+  // allow for test buttons to be created
+  if (!strcmp(dpath, "test") || !strcmp(dpath, "t") || !strcmp(dpath, "poop")) { 
+    free(dpath);
+    dpath = NULL;
+  }
+   
+  // following entries can either be omitted, or 0
+  // so make sure you don't neglect a filepath that starts with 0
+  // fucking maniac
+  char* hpath = get_delimited_value(bs, DELIMITER, 5);
+  if (hpath) if (strlen(hpath) <= 1 && *hpath == '0') hpath = NULL;
+
+  char* cpath = get_delimited_value(bs, DELIMITER, 6);
+  if (cpath) if (strlen(cpath) <= 1 && *cpath == '0') cpath = NULL;
+
+  // if dpath was defined as a testing texture, no need to pass it to this function
+  // also, it would call an error of dpath wasn't defined lolsies
+  if (dpath)
+    if (!init_button_textures(r, dest, dpath, hpath, cpath))
+      return NULL;
+
+  // gotta free result of many of these functions
+  free(bs);
+  if (dpath) free(dpath);
+  if (hpath) free(hpath);
+  if (cpath) free(cpath);
+  return dest;
+}
+
+
+Button* init_button_match(SDL_Renderer* r, char* path, char* match, void (*callback)(void* callback_data), void* userdata) {
+  if (!path || !r) return NULL;
+
+  char* bs = get_line_match(path, match);
+  if (!bs) return NULL;
+
+  float x = atof(get_delimited_value(bs, DELIMITER, 0));
+  float y = atof(get_delimited_value(bs, DELIMITER, 1));
+  float w = atof(get_delimited_value(bs, DELIMITER, 2));
+  float h = atof(get_delimited_value(bs, DELIMITER, 3));
+  Button* dest = init_button(x,y,w,h,callback,userdata);
+
+  char* dpath = get_delimited_value(bs, DELIMITER, 4);
+  if (!dpath) { 
+      SDL_Log("default button path must be defined in %s", path);
+      return NULL;
+  }
+
+  if (!strcmp(dpath, "test") || !strcmp(dpath, "t") || !strcmp(dpath, "poop")) { 
+    SDL_Log("hi");
+    free(dpath);
+    dpath = NULL;
+  }
+
+  char* hpath = get_delimited_value(bs, DELIMITER, 5);
+  if (hpath) if (strlen(hpath) <= 1 && *hpath == '0') hpath = NULL;
+
+  char* cpath = get_delimited_value(bs, DELIMITER, 6);
+  if (cpath) if (strlen(cpath) <= 1 && *cpath == '0') cpath = NULL;
+
+  if (dpath) 
+    if (!init_button_textures(r, dest, dpath, hpath, cpath))
+      return NULL;
+
+  free(bs);
+  if (dpath) free(dpath);
+  if (hpath) free(hpath);
+  if (cpath) free(cpath);
+  return dest;
+}
+
+
 Button* init_button(float x, float y, float w, float h, void (*callback)(void* callback_data), void* userdata) {
   Button* dest = malloc(sizeof(Button));
   if (!dest) {

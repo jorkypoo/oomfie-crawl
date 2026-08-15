@@ -5,38 +5,30 @@
 #define BTN_PATH "assets/button_default.png"
 #define BTN_PATH2 "assets/button_pressed.png"
 
+#define BTN_INIT_FILE "btns.csv"
+
 
 void change_menu_to_options(void* userdata) { 
   screen->cur_menu = 1;
 }
 
 
-Menu* get_main_menu(SDL_Renderer* renderer) {
-  if (!renderer) return NULL;  
+Menu* get_main_menu(SDL_Renderer* r) {
+  if (!r) return NULL;  
 
-  Button* tb1 = init_button(480, 0, 80, 48, change_menu_to_options, NULL);
-  if (!tb1)
-    return NULL;
-
-  if (!init_button_textures(renderer, tb1, BTN_PATH, BTN_PATH2, NULL))
-    return NULL;
-
-  Button* tb2 = init_button(560, 0, 80, 48, change_menu_to_options, NULL);
-  if (!tb2)
-    return NULL;
+  Button* tb1 = init_button_offset(r, "btns.csv", 0, change_menu_to_options, NULL);
+  if (!tb1) return NULL;
+  Button* tb2 = init_button_offset(r, BTN_INIT_FILE, 1, change_menu_to_options, NULL);
+  if (!tb2) return NULL;
+  Button* tb3 = init_button_offset(r, BTN_INIT_FILE, 2, change_menu_to_options, NULL);
+  if (!tb3) return NULL;
   
-  if (!init_button_textures(renderer, tb2, BTN_PATH, BTN_PATH2, NULL))
-    return NULL;
-
   Menu* dest = init_menu();
-  if (!dest)
-    return NULL;
+  if (!dest) return NULL;
 
-  if (!add_button_to_menu(dest, tb1))
-    return NULL;
-  
-  if (!add_button_to_menu(dest, tb2))
-    return NULL;
+  if (!add_button_to_menu(dest, tb1)) return NULL;
+  if (!add_button_to_menu(dest, tb2)) return NULL;
+  if (!add_button_to_menu(dest, tb3)) return NULL;
 
   return dest;
 }

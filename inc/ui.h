@@ -180,13 +180,13 @@ Button* init_button(float x, float y, float w, float h,\
 int init_button_textures(SDL_Renderer* r, Button* target,\
                           char* def_path, char* hov_path, char* clk_path);
 
-/* button files will be standardized; see ... for an example */
+/* button files will be standardized; see btns in root for an example */
 
 // initialises a button from a file; searches button file with an offset: 0 being first entry, etc
-Button* init_button_from_file_offset(char* path, int offset, void (*callback)(void* callback_data), void* userdata);
+Button* init_button_offset(SDL_Renderer* r, char* path, int offset, void (*callback)(void* callback_data), void* userdata);
 
 // same as above, but searches for a string match. function above ignores any strings at the beginning of lines
-Button* init_button_from_file_match(char* path, char* match, void (*callback)(void* callback_data), void* userdata);
+Button* init_button_match(SDL_Renderer* r, char* path, char* match, void (*callback)(void* callback_data), void* userdata);
 
 // add text to the button; NULL is ok
 int init_button_text(SDL_Renderer* r, Button* target, char* text);
