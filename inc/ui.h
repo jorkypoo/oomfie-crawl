@@ -23,6 +23,9 @@
 typedef struct Element Element;
 struct Element {
   SDL_FRect rect;
+  int hovered;
+  int clicked;
+  int selected;
 };
 
 
