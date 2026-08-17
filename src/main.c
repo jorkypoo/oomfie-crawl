@@ -15,27 +15,6 @@ Application app = { 0 };
 
 
 int main(int argc, char* argv[]) {
-
-  /*
-
-  // testing out some stuff for filesystem management 
-  //list_dir_alpha_sorted(".", SORT_DESCENDING);
-
-  // testing out creating buttons from files
-  char* tmp = get_line_offset("btns.csv", 1);
-  //if (tmp) printf("%s\n", tmp);
-  if (tmp) free(tmp); // must free results from these functions
-
-  char* tmp2 = get_line_match("btns.csv", "poop");
-  //if (tmp2) printf("%s\n", tmp2);
-
-  char* tmp3 = get_delimited_value(tmp2, ',', 5);
-  //if (tmp3) printf("%s\n", tmp3);
-  if (tmp3) free(tmp3);
-  if (tmp2) free(tmp2); // again, returned by get_line_match and must free
-
-  */
-
   if (!init_game(&app)) { 
     return 1;
   }

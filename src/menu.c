@@ -16,7 +16,7 @@ void change_menu_to_options(void* userdata) {
 Menu* get_main_menu(SDL_Renderer* r) {
   if (!r) return NULL;  
 
-  Button* tb1 = init_button_offset(r, "btns.csv", 0, change_menu_to_options, NULL);
+  Button* tb1 = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_to_options, NULL);
   if (!tb1) return NULL;
   Button* tb2 = init_button_offset(r, BTN_INIT_FILE, 1, change_menu_to_options, NULL);
   if (!tb2) return NULL;
