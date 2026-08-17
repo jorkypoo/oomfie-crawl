@@ -18,17 +18,11 @@ Menu* get_main_menu(SDL_Renderer* r) {
 
   Button* tb1 = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_to_options, NULL);
   if (!tb1) return NULL;
-  Button* tb2 = init_button_offset(r, BTN_INIT_FILE, 1, change_menu_to_options, NULL);
-  if (!tb2) return NULL;
-  Button* tb3 = init_button_offset(r, BTN_INIT_FILE, 2, change_menu_to_options, NULL);
-  if (!tb3) return NULL;
   
   Menu* dest = init_menu();
   if (!dest) return NULL;
 
-  if (!add_button_to_menu(dest, tb1)) return NULL;
-  if (!add_button_to_menu(dest, tb2)) return NULL;
-  if (!add_button_to_menu(dest, tb3)) return NULL;
+  if (!add_element_to_menu(dest, &tb1->base)) return NULL;
 
   return dest;
 }
@@ -52,9 +46,9 @@ Menu* get_options_menu(SDL_Renderer* renderer) {
   Menu* dest = init_menu();
   if (!dest) return NULL;
 
-  if (!add_button_to_menu(dest, tb1)) return NULL;
+  if (!add_element_to_menu(dest, &tb1->base)) return NULL;
   
-  if (!add_button_to_menu(dest, tb2)) return NULL;
+  if (!add_element_to_menu(dest, &tb2->base)) return NULL;
 
   return dest;
 }
