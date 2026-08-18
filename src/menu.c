@@ -19,12 +19,15 @@ Menu* get_main_menu(SDL_Renderer* r) {
   if (!tb) return NULL;
 
   Textbox* tt = init_textbox(r, 560, 0, 80, 48, "hello", NULL);
+
+  Textbox* tt2 = init_textbox(r, 480, 48, 5*16, 16, "hello", NULL);
   
   Menu* dest = init_menu();
   if (!dest) return NULL;
 
   if (!add_element_to_menu(dest, &tb->base)) return NULL;
   if (!add_element_to_menu(dest, &tt->base)) return NULL;
+  if (!add_element_to_menu(dest, &tt2->base)) return NULL;
 
   return dest;
 }

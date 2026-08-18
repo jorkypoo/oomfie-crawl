@@ -109,6 +109,10 @@ void render_simple_button(SDL_Renderer* renderer, Button* target, Uint8 r, Uint8
 Textbox* init_textbox(SDL_Renderer* r, float x, float y, float w, float h, char* text, char* texture_path);
 void add_textbox_bg_color(Textbox* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
+// textbox function that automatically determine the width...
+// fuck around with these functions more
+// these functions wouldn't be given a width or height, that's what's calculated
+
 void handle_textbox_event(mouse_position* mpos, Element* e, SDL_Event* event);
 void render_textbox(Application* app, Element* e);
 void free_textbox(Element* e);

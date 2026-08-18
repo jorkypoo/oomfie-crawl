@@ -370,7 +370,26 @@ void render_textbox(Application* app, Element* e) {
 
   // render text
   if (!t->text) return;
-  ;
+  SDL_Color white = {255, 255, 255, 255};
+  SDL_FRect drect;
+
+  SDL_Surface* s = TTF_RenderText_Solid(app->font, t->text, 0, white);
+  SDL_Texture* d = SDL_CreateTextureFromSurface(app->renderer, s);
+  SDL_DestroySurface(s);
+  SDL_GetTextureSize(d, &drect.w, &drect.h);
+  drect.x = t->base.rect.x; drect.y = t->base.rect.y;
+  SDL_RenderTexture(app->renderer, d, NULL, &drect);
+  SDL_DestroyTexture(d);
+
+  /* // this kinda works
+  //SDL_Surface* s = TTF_RenderText_Solid(app->font, t->text, 0, app->font_color);
+  SDL_Surface* s = TTF_RenderText_Solid(app->font, t->text, 0, white);
+  SDL_Texture* d = SDL_CreateTextureFromSurface(app->renderer, s);
+  SDL_DestroySurface(s);
+  SDL_RenderTexture(app->renderer, d, NULL, &t->base.rect);
+  SDL_DestroyTexture(d);
+  */
+  
 }
 
 void free_textbox(Element* e) {
