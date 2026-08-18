@@ -18,16 +18,16 @@ Menu* get_main_menu(SDL_Renderer* r) {
   Button* tb = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_to_options, NULL);
   if (!tb) return NULL;
 
-  Textbox* tt = init_textbox(r, 560, 0, 80, 48, "hello", NULL);
+  Label* tl = init_label(r, 560, 0, 80, 48, "hello", NULL);
 
-  Textbox* tt2 = init_textbox(r, 480, 48, 5*16, 16, "hello", NULL);
+  Label* tl2 = init_label(r, 480, 48, 5*16, 32, "hello", NULL);
   
   Menu* dest = init_menu();
   if (!dest) return NULL;
 
   if (!add_element_to_menu(dest, &tb->base)) return NULL;
-  if (!add_element_to_menu(dest, &tt->base)) return NULL;
-  if (!add_element_to_menu(dest, &tt2->base)) return NULL;
+  if (!add_element_to_menu(dest, &tl->base)) return NULL;
+  if (!add_element_to_menu(dest, &tl2->base)) return NULL;
 
   return dest;
 }

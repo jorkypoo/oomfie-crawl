@@ -291,10 +291,10 @@ void render_simple_button(SDL_Renderer* renderer, Button* target, Uint8 r, Uint8
   SDL_RenderFillRect(renderer, &target->base.rect);
 }
 
-/* textbox shit */
+/* label shit */
 
-Textbox* init_textbox(SDL_Renderer* r, float x, float y, float w, float h, char* text, char* texture_path) {
-  Textbox* dest = malloc(sizeof(Textbox));
+Label* init_label(SDL_Renderer* r, float x, float y, float w, float h, char* text, char* texture_path) {
+  Label* dest = malloc(sizeof(Label));
   if (!dest) return NULL;
 
   SDL_FRect re = {x,y,w,h};
@@ -303,9 +303,9 @@ Textbox* init_textbox(SDL_Renderer* r, float x, float y, float w, float h, char*
   dest->base.hovered = 0;
   dest->base.clicked = 0;
 
-  dest->base.handle_event = handle_textbox_event;
-  dest->base.draw = render_textbox;
-  dest->base.destroy = free_textbox;
+  dest->base.handle_event = handle_label_event;
+  dest->base.draw = render_label;
+  dest->base.destroy = free_label;
 
   // dest color's alpha is set to 0 until initialised
   dest->color.r = 0;
@@ -316,7 +316,7 @@ Textbox* init_textbox(SDL_Renderer* r, float x, float y, float w, float h, char*
   if (texture_path) { // texture path can be NULL
     dest->bg = create_tex(r, texture_path);
     if (!dest->bg) {
-      SDL_Log("could not create textbox bg texture from %s; will use a default color", texture_path);
+      SDL_Log("could not create label bg texture from %s; will use a default color", texture_path);
       dest->bg = NULL;
     }
   } else { // texture path can be NULL
@@ -332,7 +332,7 @@ Textbox* init_textbox(SDL_Renderer* r, float x, float y, float w, float h, char*
   return dest;
 }
 
-void add_textbox_bg_color(Textbox* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+void add_label_bg_color(Label* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
   t->color.r = r;
   t->color.g = g;
   t->color.b = b;
@@ -343,19 +343,19 @@ void add_textbox_bg_color(Textbox* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
     t->color.a = a;
 }
 
-void handle_textbox_event(mouse_position* mpos, Element* e, SDL_Event* event) {
+void handle_label_event(mouse_position* mpos, Element* e, SDL_Event* event) {
   if (!e) return;
 
-  Textbox* t = (Textbox*)e;
+  Label* t = (Label*)e;
 
   // don't have to do anything rlly
 }
 
-void render_textbox(Application* app, Element* e) {
+void render_label(Application* app, Element* e) {
   // render bg THEN text so text is drawn on top
   if (!e) return;
 
-  Textbox* t = (Textbox*)e;
+  Label* t = (Label*)e;
 
   // render bg
   if (t->bg) { // render background, or a default 
@@ -376,26 +376,26 @@ void render_textbox(Application* app, Element* e) {
   SDL_Surface* s = TTF_RenderText_Solid(app->font, t->text, 0, white);
   SDL_Texture* d = SDL_CreateTextureFromSurface(app->renderer, s);
   SDL_DestroySurface(s);
+
+  // grab dimensions for positioning the text
   SDL_GetTextureSize(d, &drect.w, &drect.h);
-  drect.x = t->base.rect.x; drect.y = t->base.rect.y;
+
+  // centre text y value
+  drect.y = t->base.rect.y + ((t->base.rect.h - drect.h) / 2);
+
+  // centre text x value... gleep
+  drect.x = t->base.rect.x + ((t->base.rect.w - drect.w) / 2); 
+
+  
+  //SDL_Log("rect size - h:%f, w:%f", drect.w, drect.h);
   SDL_RenderTexture(app->renderer, d, NULL, &drect);
   SDL_DestroyTexture(d);
-
-  /* // this kinda works
-  //SDL_Surface* s = TTF_RenderText_Solid(app->font, t->text, 0, app->font_color);
-  SDL_Surface* s = TTF_RenderText_Solid(app->font, t->text, 0, white);
-  SDL_Texture* d = SDL_CreateTextureFromSurface(app->renderer, s);
-  SDL_DestroySurface(s);
-  SDL_RenderTexture(app->renderer, d, NULL, &t->base.rect);
-  SDL_DestroyTexture(d);
-  */
-  
 }
 
-void free_textbox(Element* e) {
+void free_label(Element* e) {
   if (!e) return;
 
-  Textbox* dest = (Textbox*)e;
+  Label* dest = (Label*)e;
 
   if (dest->text) free(dest->text);
   if (dest->bg)   SDL_DestroyTexture(dest->bg);

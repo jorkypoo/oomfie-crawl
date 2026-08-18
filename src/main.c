@@ -14,16 +14,20 @@ Menu* menu = NULL;
 Screen* screen = NULL;
 Application app = { 0 };
 
+SDL_Texture* hanyuu = NULL;
+
 
 int main(int argc, char* argv[]) {
   if (!init_game(&app)) 
     return 1;
 
-  if (!init_global_font(&app, "assets/monogram.ttf", 16))
+  if (!init_global_font(&app, "assets/monogram.ttf", 32, 255, 255, 255))
     SDL_Log("font not initialised: %s", SDL_GetError());
   
   menu = get_menu(app.renderer, 0);
   screen = init_screen(menu);
+
+  hanyuu = create_tex(app.renderer, "assets/hanyuu_bg.png");
 
   while (app.running) {
     input(&app);
@@ -109,6 +113,7 @@ void input(Application *app) {
 
 
 void render(Application* app) {
+  /*
   // rendering a cheeky sample map
   for (int y = 0; y < BASE_HEIGHT/16; y++) {
     for (int x = 0; x < BASE_HEIGHT/16; x++) {
@@ -119,6 +124,10 @@ void render(Application* app) {
     SDL_RenderFillRect(app->renderer, &rect);
     }
   }
+  */
+  // render hanyuu bc i wanna see something cute when i'm working on this project
+  SDL_FRect rect = {0, 0, 480, 480};
+  SDL_RenderTexture(app->renderer, hanyuu, NULL, &rect);
   
   // render the current menu
   render_screen(app, screen);

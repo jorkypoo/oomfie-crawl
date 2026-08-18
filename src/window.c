@@ -147,8 +147,14 @@ void quit_game(Application* game) {
 }
 
 
-int init_global_font(Application* app, char* path, float px) {
+int init_global_font(Application* app, char* path, float px, Uint8 r, Uint8 g, Uint8 b) {
   if (!app) return 0;
+
+  app->font_size = 16;
+  app->font_color.r = r;
+  app->font_color.g = g;
+  app->font_color.b = b;
+  app->font_color.a = 255;
 
   app->font = TTF_OpenFont(path, px);
   if (!app->font) {
@@ -162,7 +168,7 @@ int init_global_font(Application* app, char* path, float px) {
 
 void init_rendering(Application* game) {
   SDL_SetRenderTarget(game->renderer, game->game_texture);
-  SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255);
+  SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
   SDL_RenderClear(game->renderer);
 }
 

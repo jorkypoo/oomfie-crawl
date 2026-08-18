@@ -41,8 +41,8 @@ struct Button {
 };
 
 
-typedef struct Textbox Textbox;
-struct Textbox {
+typedef struct Label Label;
+struct Label {
   Element base;
 
   SDL_Texture* bg; // background texture
@@ -75,6 +75,8 @@ struct Screen {
 
 /* ===== element functions ===== */
 
+SDL_Texture* create_tex(SDL_Renderer* renderer, char* path);
+
 // basically the menu calls these functions, which calls the elements given
 // function pointer to the relevant function - button calls draw_button and so on
 void handle_element_event(mouse_position* mpos, Element* e, SDL_Event* ev);
@@ -103,19 +105,19 @@ void free_button(Element* e);
 // internal use
 void render_simple_button(SDL_Renderer* renderer, Button* target, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
-/* ===== textbox functions ===== */
+/* ===== label functions ===== */
 
-// create a textbox with dimensions, text to draw and a background texture
-Textbox* init_textbox(SDL_Renderer* r, float x, float y, float w, float h, char* text, char* texture_path);
-void add_textbox_bg_color(Textbox* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+// create a label with dimensions, text to draw and a background texture
+Label* init_label(SDL_Renderer* r, float x, float y, float w, float h, char* text, char* texture_path);
+void add_label_bg_color(Label* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
-// textbox function that automatically determine the width...
+// label function that automatically determine the width...
 // fuck around with these functions more
 // these functions wouldn't be given a width or height, that's what's calculated
 
-void handle_textbox_event(mouse_position* mpos, Element* e, SDL_Event* event);
-void render_textbox(Application* app, Element* e);
-void free_textbox(Element* e);
+void handle_label_event(mouse_position* mpos, Element* e, SDL_Event* event);
+void render_label(Application* app, Element* e);
+void free_label(Element* e);
 
 
 /* ===== menu functions ===== */ 

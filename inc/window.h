@@ -8,6 +8,10 @@
 
 #define BASE_WIDTH  640
 #define BASE_HEIGHT 480
+#define MENU_WIDTH  160
+#define MENU_HEIGHT 480
+#define MENU_X      480
+#define MENU_Y      0
 #define BLOCK_SIZE  16
 
 #define NURUPO ((void*)0)
@@ -39,6 +43,9 @@ struct Application {
   SDL_Renderer* renderer;
   SDL_Texture*  game_texture; // acts as the game's rendering target - keeps logic at a single resolution
   TTF_Font*     font;         // global font
+
+  SDL_Color font_color;
+  float font_size;
 
   // window dimensions - set to and kept at BASE_WIDTH & HEIGHT in init()
   // the game is upscaled later so game logic should be written in terms of those macros 
@@ -84,7 +91,7 @@ int init_game(Application* app);
 void quit_game(Application* app);
 
 // add a .ttf file & initialise it as the game's global font
-int init_global_font(Application* app, char* path, float px);
+int init_global_font(Application* app, char* path, float px, Uint8 r, Uint8 g, Uint8 b);
 
 // wrapper to set the rendering target to the game texture
 void init_rendering(Application* app); // MUST BE CALLED BEFORE CUSTOM RENDERING CODE
