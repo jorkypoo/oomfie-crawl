@@ -293,11 +293,95 @@ void render_simple_button(SDL_Renderer* renderer, Button* target, Uint8 r, Uint8
 
 /* textbox shit */
 
-Textbox* init_textbox(float x, float y, float w, float h, char* text) {
+Textbox* init_textbox(SDL_Renderer* r, float x, float y, float w, float h, char* text, char* texture_path) {
   Textbox* dest = malloc(sizeof(Textbox));
   if (!dest) return NULL;
 
+  SDL_FRect re = {x,y,w,h};
+  dest->base.rect = re;
+
+  dest->base.hovered = 0;
+  dest->base.clicked = 0;
+
+  dest->base.handle_event = handle_textbox_event;
+  dest->base.draw = render_textbox;
+  dest->base.destroy = free_textbox;
+
+  // dest color's alpha is set to 0 until initialised
+  dest->color.r = 0;
+  dest->color.g = 0;
+  dest->color.b = 0;
+  dest->color.a = 0;
+
+  if (texture_path) { // texture path can be NULL
+    dest->bg = create_tex(r, texture_path);
+    if (!dest->bg) {
+      SDL_Log("could not create textbox bg texture from %s; will use a default color", texture_path);
+      dest->bg = NULL;
+    }
+  } else { // texture path can be NULL
+    dest->bg = NULL;
+  }
+  
+  dest->text = strdup(text);
+  if (!dest->text)
+    return NULL;
+
+  dest->text_len = strlen(dest->text) + 1;
+
   return dest;
+}
+
+void add_textbox_bg_color(Textbox* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
+  t->color.r = r;
+  t->color.g = g;
+  t->color.b = b;
+
+  if (a == 0)
+    t->color.a = 1;
+  else
+    t->color.a = a;
+}
+
+void handle_textbox_event(mouse_position* mpos, Element* e, SDL_Event* event) {
+  if (!e) return;
+
+  Textbox* t = (Textbox*)e;
+
+  // don't have to do anything rlly
+}
+
+void render_textbox(Application* app, Element* e) {
+  // render bg THEN text so text is drawn on top
+  if (!e) return;
+
+  Textbox* t = (Textbox*)e;
+
+  // render bg
+  if (t->bg) { // render background, or a default 
+    SDL_RenderTexture(app->renderer, t->bg, NULL, &t->base.rect);
+  } else if (t->color.a != 0) { // used color, if it was added
+    SDL_SetRenderDrawColor(app->renderer, t->color.r, t->color.g, t->color.b, t->color.a);
+    SDL_RenderFillRect(app->renderer, &t->base.rect);
+  } else {
+    SDL_SetRenderDrawColor(app->renderer, 0, 255, 0, 255);
+    SDL_RenderFillRect(app->renderer, &t->base.rect);
+  }
+
+  // render text
+  if (!t->text) return;
+  ;
+}
+
+void free_textbox(Element* e) {
+  if (!e) return;
+
+  Textbox* dest = (Textbox*)e;
+
+  if (dest->text) free(dest->text);
+  if (dest->bg)   SDL_DestroyTexture(dest->bg);
+  
+  free(dest);
 }
 
 /* menu shit */
