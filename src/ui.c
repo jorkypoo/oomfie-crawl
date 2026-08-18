@@ -17,11 +17,14 @@ SDL_Texture* create_tex(SDL_Renderer* r, char* path) {
 
 /* element shit */
 
-void draw_element(SDL_Renderer* r, Element* e) {
+void draw_element(Application* app, Element* e) {
   if (!e || !e->draw)
     return;
 
-  e->draw(r, e);
+  if (!app || !app->renderer)
+    return;
+
+  e->draw(app, e);
 }
 
 void handle_element_event(mouse_position* mpos, Element* e, SDL_Event* ev) {
@@ -243,28 +246,28 @@ void handle_button_event(mouse_position* mpos, Element* e, SDL_Event* event) {
   }
 }
 
-void render_button(SDL_Renderer* r, Element* e) {
-  if (!r || !e) return;
+void render_button(Application* app, Element* e) {
+  if (!e) return;
 
   Button* b = (Button*)e;
 
   if (b->base.clicked) {
     if (b->tex_clicked)
-      SDL_RenderTexture(r, b->tex_clicked, NULL, &b->base.rect);
+      SDL_RenderTexture(app->renderer, b->tex_clicked, NULL, &b->base.rect);
     else
-      render_simple_button(r, b, 0, 255, 0, 255);
+      render_simple_button(app->renderer, b, 0, 255, 0, 255);
   }
   else if (b->base.hovered) {
     if (b->tex_hovered)
-      SDL_RenderTexture(r, b->tex_hovered, NULL, &b->base.rect);
+      SDL_RenderTexture(app->renderer, b->tex_hovered, NULL, &b->base.rect);
     else
-      render_simple_button(r, b, 255, 255, 0, 255);
+      render_simple_button(app->renderer, b, 255, 255, 0, 255);
   }
   else {
     if (b->tex_default)
-      SDL_RenderTexture(r, b->tex_default, NULL, &b->base.rect);
+      SDL_RenderTexture(app->renderer, b->tex_default, NULL, &b->base.rect);
     else
-      render_simple_button(r, b, 255, 0, 0, 255);
+      render_simple_button(app->renderer, b, 255, 0, 0, 255);
   }
 }
 
@@ -286,6 +289,15 @@ void render_simple_button(SDL_Renderer* renderer, Button* target, Uint8 r, Uint8
   
   SDL_SetRenderDrawColor(renderer, r, g, b, a);
   SDL_RenderFillRect(renderer, &target->base.rect);
+}
+
+/* textbox shit */
+
+Textbox* init_textbox(float x, float y, float w, float h, char* text) {
+  Textbox* dest = malloc(sizeof(Textbox));
+  if (!dest) return NULL;
+
+  return dest;
 }
 
 /* menu shit */
@@ -338,15 +350,15 @@ void handle_menu_event(mouse_position* mpos, Menu* menu, SDL_Event* e) {
   }
 }
 
-void render_menu(SDL_Renderer* r, Menu* menu) {
-  if (!r || !menu) return;
+void render_menu(Application* app, Menu* menu) {
+  if (!app->renderer || !menu) return;
 
   for (int i = 0; i < menu->count; i++) {
     if (!menu->elements[i]) { 
       SDL_Log("warning! button no. %d in menu is...invalid?", i);
       continue;
     }
-    draw_element(r, menu->elements[i]);
+    draw_element(app, menu->elements[i]);
   }
 }
 
@@ -402,8 +414,8 @@ void handle_screen_input(mouse_position* mpos, Screen* s, SDL_Event* e) {
 }
 
 
-void render_screen(SDL_Renderer* r, Screen* s) {
-  render_menu(r, s->current_menu);
+void render_screen(Application* app, Screen* s) {
+  render_menu(app, s->current_menu);
 }
 
 

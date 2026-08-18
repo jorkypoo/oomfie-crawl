@@ -23,7 +23,7 @@ struct Element {
   int clicked;
 
   void (*handle_event)(mouse_position* mpos, Element* e, SDL_Event* ev);
-  void (*draw)(SDL_Renderer* r, Element* e);
+  void (*draw)(Application* app, Element* e);
   void (*destroy)(Element* e);
 };
 
@@ -77,7 +77,7 @@ struct Screen {
 // basically the menu calls these functions, which calls the elements given
 // function pointer to the relevant function - button calls draw_button and so on
 void handle_element_event(mouse_position* mpos, Element* e, SDL_Event* ev);
-void draw_element(SDL_Renderer* renderer, Element* e);
+void draw_element(Application* app, Element* e);
 void destroy_element(Element* e);
 
 // called within handle handle_element_event to detect hovering
@@ -96,7 +96,7 @@ Button* init_button_match(SDL_Renderer* r, char* path, char* match, void (*callb
 
 // these must take an element instead of button, which is then cast into a button
 void handle_button_event(mouse_position* mpos, Element* e, SDL_Event* event);
-void render_button(SDL_Renderer* r, Element* e);
+void render_button(Application* app, Element* e);
 void free_button(Element* e);
 
 // internal use
@@ -104,7 +104,11 @@ void render_simple_button(SDL_Renderer* renderer, Button* target, Uint8 r, Uint8
 
 /* ===== textbox functions ===== */
 
-Textbox* init_textbox();
+Textbox* init_textbox(float x, float y, float w, float h, char* text);
+
+void handle_textbox_event(mouse_position* mpos, Element* e, SDL_Event* event);
+void render_textbox(Application* app, Element* e);
+void free_button(Element* e);
 
 
 /* ===== menu functions ===== */ 
@@ -113,7 +117,7 @@ Menu* init_menu();
 int add_element_to_menu(Menu* menu, Element* e);
 
 void handle_menu_event(mouse_position* mpos, Menu* menu, SDL_Event* e);
-void render_menu(SDL_Renderer* r, Menu* menu);
+void render_menu(Application* app, Menu* menu);
 void free_menu(Menu* src); 
 
 /* ===== screen functions ===== */
@@ -123,7 +127,7 @@ int update_screen_current_menu(Screen* s, Menu* m);
 // int update_screen_current_game(Screen* s. Game* g);
 
 void handle_screen_input(mouse_position* mpos, Screen* s, SDL_Event* e);
-void render_screen(SDL_Renderer* r, Screen* s);
+void render_screen(Application* app, Screen* s);
 void free_screen(Screen* s);
 
 // internal use

@@ -3,6 +3,7 @@
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_video.h>
+#include <SDL3_ttf/SDL_ttf.h>
 
 
 #define BASE_WIDTH  640
@@ -36,7 +37,8 @@ typedef struct Application Application;
 struct Application {
   SDL_Window*   window;
   SDL_Renderer* renderer;
-  SDL_Texture*  game_texture;
+  SDL_Texture*  game_texture; // acts as the game's rendering target - keeps logic at a single resolution
+  TTF_Font*     font;         // global font
 
   // window dimensions - set to and kept at BASE_WIDTH & HEIGHT in init()
   // the game is upscaled later so game logic should be written in terms of those macros 
@@ -54,38 +56,41 @@ struct Application {
 
 
 // grab the mouse coordinates and scale them for use in-game
-void get_scaled_mouse_coords(Application* game);
+void get_scaled_mouse_coords(Application* app);
 
 // update the scale factor for every button... idk its for ui
-void get_game_scale(Application* game, float* sx, float* sy);
+void get_game_scale(Application* app, float* sx, float* sy);
 
 // used indirectly inside scroll_game_resolutions()
-void set_game_resolution(Application* game, int w, int h);
+void set_game_resolution(Application* app, int w, int h);
 
 // returns games current resolution for displaying ig; something like "600x400"
-char* get_current_game_resolution(Application* game);
+char* get_current_game_resolution(Application* app);
 
 // used in a menu or whatever; scrolls through available screen resolutions
 // also returns games current resolution
-char* scroll_game_resolutions(Application* game);
+char* scroll_game_resolutions(Application* app);
 
 // toggles between windowed & fullscreen borderless mode
-void toggle_borderless_mode(Application* game);
+void toggle_borderless_mode(Application* app);
 
 // currently not working, but should force display to be whatever the selected game resolution is
-void toggle_fullscreen_mode(Application* game);
+void toggle_fullscreen_mode(Application* app);
 
 // initialises SDL and everything and returns a game object
-int init_game(Application* game); 
+int init_game(Application* app); 
 
 // cleanup
-void quit_game(Application* game);
+void quit_game(Application* app);
+
+// add a .ttf file & initialise it as the game's global font
+int init_global_font(Application* app, char* path, float px);
 
 // wrapper to set the rendering target to the game texture
-void init_rendering(Application* game); // MUST BE CALLED BEFORE CUSTOM RENDERING CODE
+void init_rendering(Application* app); // MUST BE CALLED BEFORE CUSTOM RENDERING CODE
 
 // scales game window up based on currently selected resolution
 // helps maintain game & ui logic at the base window dimensions
-void upscale_game(Application* game); // MUST BE CALLED AFTER CUSTOM RENDERING CODE
+void upscale_game(Application* app); // MUST BE CALLED AFTER CUSTOM RENDERING CODE
 
 #endif

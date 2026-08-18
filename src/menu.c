@@ -16,13 +16,16 @@ void change_menu_to_options(void* userdata) {
 Menu* get_main_menu(SDL_Renderer* r) {
   if (!r) return NULL;  
 
-  Button* tb1 = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_to_options, NULL);
-  if (!tb1) return NULL;
+  Button* tb = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_to_options, NULL);
+  if (!tb) return NULL;
+
+  //Textbox* tt = init_textbox();
   
   Menu* dest = init_menu();
   if (!dest) return NULL;
 
-  if (!add_element_to_menu(dest, &tb1->base)) return NULL;
+  if (!add_element_to_menu(dest, &tb->base)) return NULL;
+  //if (!add_element_to_menu(dest, &tt->base)) return NULL;
 
   return dest;
 }

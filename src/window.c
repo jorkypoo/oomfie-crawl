@@ -90,7 +90,12 @@ void toggle_fullscreen_mode(Application* game) { // this shit does not work
 int init_game(Application* game) {
   if (!SDL_Init(SDL_INIT_VIDEO)) {
     SDL_Log("SDL_Init failed: %s", SDL_GetError());
-    return false;
+    return 0;
+  }
+
+  if (!TTF_Init()) {
+    SDL_Log("TTF_Init failed: %s", SDL_GetError());
+    return 0;
   }
 
   game->width = BASE_WIDTH;
@@ -102,6 +107,8 @@ int init_game(Application* game) {
 
   game->borderless = 0;
   game->fullscreen = 0;
+
+  game->font = NULL;
 
   game->window = SDL_CreateWindow("roguelike test", game->width, game->height, 0);
   if (!game->window) { 
@@ -129,10 +136,27 @@ int init_game(Application* game) {
 
 
 void quit_game(Application* game) {
+  if (game->font) TTF_CloseFont(game->font);
+
   SDL_DestroyTexture(game->game_texture);
   SDL_DestroyRenderer(game->renderer);
   SDL_DestroyWindow(game->window);
+
+  TTF_Quit();
   SDL_Quit();
+}
+
+
+int init_global_font(Application* app, char* path, float px) {
+  if (!app) return 0;
+
+  app->font = TTF_OpenFont(path, px);
+  if (!app->font) {
+    app->font = NULL;
+    return 0;
+  }
+
+  return 1;
 }
 
 
@@ -140,7 +164,6 @@ void init_rendering(Application* game) {
   SDL_SetRenderTarget(game->renderer, game->game_texture);
   SDL_SetRenderDrawColor(game->renderer, 255, 255, 255, 255);
   SDL_RenderClear(game->renderer);
-
 }
 
 

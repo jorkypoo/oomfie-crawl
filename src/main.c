@@ -1,7 +1,8 @@
 #include "../inc/window.h"
 #include "../inc/ui.h"
-#include "../inc/menu.h"
 #include "../inc/filesystem.h"
+
+#include "../inc/menu.h"
 
 // basic sdl frame loop functions
 void input(Application* game);
@@ -15,10 +16,12 @@ Application app = { 0 };
 
 
 int main(int argc, char* argv[]) {
-  if (!init_game(&app)) { 
+  if (!init_game(&app)) 
     return 1;
-  }
 
+  if (!init_global_font(&app, "assets/monogram.ttf", 16))
+    SDL_Log("font not initialised: %s", SDL_GetError());
+  
   menu = get_menu(app.renderer, 0);
   screen = init_screen(menu);
 
@@ -118,5 +121,5 @@ void render(Application* app) {
   }
   
   // render the current menu
-  render_screen(app->renderer, screen);
+  render_screen(app, screen);
 }
