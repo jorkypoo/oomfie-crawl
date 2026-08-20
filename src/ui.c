@@ -76,6 +76,9 @@ Button* init_button(float x,float y,float w,float h,void(*callback)(void* data),
   dest->tex_hovered = NULL;
   dest->tex_clicked = NULL;
 
+  dest->text = NULL;
+  dest->text_len = 0;
+
   return dest;
 }
 
@@ -131,6 +134,20 @@ int init_button_textures(SDL_Renderer* r,Button* b,char* def_path,char* hov_path
   return 1;
 }
 
+int init_button_text(Button* b, char* text) {
+  if (!b || !text) return 0;
+
+  b->text = strdup(text);
+  if (!b->text) {
+    b->text = NULL;
+    return 0;
+  }
+
+  b->text_len = strlen(b->text) + 1;
+
+  return 1;
+}
+
 // these are to be called by the user, but they can also use the  ones above
 Button* init_button_offset(SDL_Renderer* r, char* path, int offset, void (*callback)(void* callback_data), void* userdata) {
   if (!path || !r) return NULL;
@@ -146,15 +163,22 @@ Button* init_button_offset(SDL_Renderer* r, char* path, int offset, void (*callb
   float h = atof(get_delimited_value(bs, DELIMITER, 3));
   Button* dest = init_button(x,y,w,h,callback,userdata);
 
+  // get the button text at offset 4 & assign keywords to not draw text on button
+  char* txt = get_delimited_value(bs, DELIMITER, 4);
+  if (!strcmp(txt, "test") || !strcmp(txt, "notext"))
+    dest->text = NULL;
+  else
+    init_button_text(dest, txt);
+
   // dpath must be defined; others can be empty or defined
-  char* dpath = get_delimited_value(bs, DELIMITER, 4);
+  char* dpath = get_delimited_value(bs, DELIMITER, 5);
   if (!dpath) { // button path must not be shit
       SDL_Log("default button path must be defined in %s", path);
       return NULL;
   }
 
-  // allow for test buttons to be created
-  if (!strcmp(dpath, "test") || !strcmp(dpath, "t") || !strcmp(dpath, "poop")) { 
+  // allow for textureless text buttons to be created
+  if (!strcmp(dpath, "test") || !strcmp(dpath, "notex") || !strcmp(dpath, "poop")) { 
     free(dpath);
     dpath = NULL;
   }
@@ -162,10 +186,10 @@ Button* init_button_offset(SDL_Renderer* r, char* path, int offset, void (*callb
   // following entries can either be omitted, or 0
   // so make sure you don't neglect a filepath that starts with 0
   // fucking maniac
-  char* hpath = get_delimited_value(bs, DELIMITER, 5);
+  char* hpath = get_delimited_value(bs, DELIMITER, 6);
   if (hpath) if (strlen(hpath) <= 1 && *hpath == '0') hpath = NULL;
 
-  char* cpath = get_delimited_value(bs, DELIMITER, 6);
+  char* cpath = get_delimited_value(bs, DELIMITER, 7);
   if (cpath) if (strlen(cpath) <= 1 && *cpath == '0') cpath = NULL;
 
   // if dpath was defined as a testing texture, no need to pass it to this function
@@ -176,6 +200,7 @@ Button* init_button_offset(SDL_Renderer* r, char* path, int offset, void (*callb
 
   // gotta free result of many of these functions
   free(bs);
+  if (txt)   free(txt);
   if (dpath) free(dpath);
   if (hpath) free(hpath);
   if (cpath) free(cpath);
@@ -194,7 +219,13 @@ Button* init_button_match(SDL_Renderer* r, char* path, char* match, void (*callb
   float h = atof(get_delimited_value(bs, DELIMITER, 3));
   Button* dest = init_button(x,y,w,h,callback,userdata);
 
-  char* dpath = get_delimited_value(bs, DELIMITER, 4);
+  char* txt = get_delimited_value(bs, DELIMITER, 4);
+  if (!strcmp(txt, "test") || !strcmp(txt, "notext"))
+    dest->text = NULL;
+  else
+    init_button_text(dest, txt);
+
+  char* dpath = get_delimited_value(bs, DELIMITER, 5);
   if (!dpath) { 
       SDL_Log("default button path must be defined in %s", path);
       return NULL;
@@ -206,10 +237,10 @@ Button* init_button_match(SDL_Renderer* r, char* path, char* match, void (*callb
     dpath = NULL;
   }
 
-  char* hpath = get_delimited_value(bs, DELIMITER, 5);
+  char* hpath = get_delimited_value(bs, DELIMITER, 6);
   if (hpath) if (strlen(hpath) <= 1 && *hpath == '0') hpath = NULL;
 
-  char* cpath = get_delimited_value(bs, DELIMITER, 6);
+  char* cpath = get_delimited_value(bs, DELIMITER, 7);
   if (cpath) if (strlen(cpath) <= 1 && *cpath == '0') cpath = NULL;
 
   if (dpath) 
@@ -217,6 +248,7 @@ Button* init_button_match(SDL_Renderer* r, char* path, char* match, void (*callb
       return NULL;
 
   free(bs);
+  if (txt)   free(txt);
   if (dpath) free(dpath);
   if (hpath) free(hpath);
   if (cpath) free(cpath);
@@ -251,6 +283,7 @@ void render_button(Application* app, Element* e) {
 
   Button* b = (Button*)e;
 
+  // rendering the button
   if (b->base.clicked) {
     if (b->tex_clicked)
       SDL_RenderTexture(app->renderer, b->tex_clicked, NULL, &b->base.rect);
@@ -269,6 +302,29 @@ void render_button(Application* app, Element* e) {
     else
       render_simple_button(app->renderer, b, 255, 0, 0, 255);
   }
+
+  // rendering the text on top
+  if (!b->text) return;
+
+  // use the game's alt font color for when text is hovered
+  SDL_Color font_color = app->font_color;
+  if (b->base.hovered)
+    font_color = app->alt_font_color;
+
+  SDL_FRect drect;
+  SDL_Surface* s = TTF_RenderText_Solid(app->font, b->text, 0, font_color);
+  SDL_Texture* d = SDL_CreateTextureFromSurface(app->renderer, s);
+  SDL_DestroySurface(s);
+
+  // grab dimensions for positioning the text
+  SDL_GetTextureSize(d, &drect.w, &drect.h);
+
+  // centre text x&y values
+  drect.y = b->base.rect.y + ((b->base.rect.h - drect.h) / 2);
+  drect.x = b->base.rect.x + ((b->base.rect.w - drect.w) / 2); 
+  
+  SDL_RenderTexture(app->renderer, d, NULL, &drect);
+  SDL_DestroyTexture(d);
 }
 
 void free_button(Element* e) {
@@ -279,6 +335,8 @@ void free_button(Element* e) {
   if (b->tex_default) SDL_DestroyTexture(b->tex_default);
   if (b->tex_hovered) SDL_DestroyTexture(b->tex_hovered);
   if (b->tex_clicked) SDL_DestroyTexture(b->tex_clicked);
+
+  if (b->text) free(b->text);
     
   free(b);
 }
@@ -371,29 +429,17 @@ void render_label(Application* app, Element* e) {
   // render text
   if (!t->text) return;
 
-  // use the game's alt font color for when text is hovered
-  // delete later - this feature should be useful for buttons only tbh
   SDL_Color font_color = app->font_color;
-  if (t->base.hovered)
-    font_color = app->alt_font_color;
-
   SDL_FRect drect;
-
   SDL_Surface* s = TTF_RenderText_Solid(app->font, t->text, 0, font_color);
   SDL_Texture* d = SDL_CreateTextureFromSurface(app->renderer, s);
   SDL_DestroySurface(s);
 
   // grab dimensions for positioning the text
   SDL_GetTextureSize(d, &drect.w, &drect.h);
-
-  // centre text y value
   drect.y = t->base.rect.y + ((t->base.rect.h - drect.h) / 2);
-
-  // centre text x value... gleep
   drect.x = t->base.rect.x + ((t->base.rect.w - drect.w) / 2); 
 
-  
-  //SDL_Log("rect size - h:%f, w:%f", drect.w, drect.h);
   SDL_RenderTexture(app->renderer, d, NULL, &drect);
   SDL_DestroyTexture(d);
 }

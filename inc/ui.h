@@ -116,6 +116,7 @@ bool on_element(Element* e, float mx, float my);
 
 // basic initialising stuff
 Button* init_button(float x, float y, float w, float h, void(*callback)(void* data), void* data);
+int init_button_text(Button* b, char* text);
 int init_button_textures(SDL_Renderer* r, Button* b, char* def_path, char* hov_path, char* clk_path);
 
 // these are to be called by the user, but they can also use the  ones above
@@ -135,10 +136,6 @@ void render_simple_button(SDL_Renderer* renderer, Button* target, Uint8 r, Uint8
 // create a label with dimensions, text to draw and a background texture
 Label* init_label(SDL_Renderer* r, float x, float y, float w, float h, char* text, char* texture_path);
 void add_label_bg_color(Label* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
-
-// label function that automatically determine the width...
-// fuck around with these functions more
-// these functions wouldn't be given a width or height, that's what's calculated
 
 void handle_label_event(mouse_position* mpos, Element* e, SDL_Event* event);
 void render_label(Application* app, Element* e);
