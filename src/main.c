@@ -1,7 +1,8 @@
 #include "../inc/window.h"
 #include "../inc/ui.h"
-#include "../inc/menu.h"
 #include "../inc/filesystem.h"
+
+#include "../inc/menu.h"
 
 // basic sdl frame loop functions
 void input(Application* game);
@@ -13,35 +14,21 @@ Menu* menu = NULL;
 Screen* screen = NULL;
 Application app = { 0 };
 
+SDL_Texture* hanyuu = NULL;
+
 
 int main(int argc, char* argv[]) {
-
-  /*
-
-  // testing out some stuff for filesystem management 
-  //list_dir_alpha_sorted(".", SORT_DESCENDING);
-
-  // testing out creating buttons from files
-  char* tmp = get_line_offset("btns.csv", 1);
-  //if (tmp) printf("%s\n", tmp);
-  if (tmp) free(tmp); // must free results from these functions
-
-  char* tmp2 = get_line_match("btns.csv", "poop");
-  //if (tmp2) printf("%s\n", tmp2);
-
-  char* tmp3 = get_delimited_value(tmp2, ',', 5);
-  //if (tmp3) printf("%s\n", tmp3);
-  if (tmp3) free(tmp3);
-  if (tmp2) free(tmp2); // again, returned by get_line_match and must free
-
-  */
-
-  if (!init_game(&app)) { 
+  if (!init_game(&app)) 
     return 1;
-  }
 
+  if (!init_global_font(&app, "assets/monogram.ttf", 32, 255, 255, 255))
+    SDL_Log("font not initialised: %s", SDL_GetError());
+  specify_alt_font_color(&app, 255, 128, 0, 255);
+  
   menu = get_menu(app.renderer, 0);
   screen = init_screen(menu);
+
+  hanyuu = create_tex(app.renderer, "assets/hanyuu_bg.png");
 
   while (app.running) {
     input(&app);
@@ -53,7 +40,7 @@ int main(int argc, char* argv[]) {
     upscale_game(&app); // engine code to be called after rendering code
 
     // fps shit
-    SDL_Delay(15/1000);
+    SDL_Delay(30/1000);
   }
   free_screen(screen);
   quit_game(&app);
@@ -127,6 +114,7 @@ void input(Application *app) {
 
 
 void render(Application* app) {
+  /*
   // rendering a cheeky sample map
   for (int y = 0; y < BASE_HEIGHT/16; y++) {
     for (int x = 0; x < BASE_HEIGHT/16; x++) {
@@ -137,7 +125,12 @@ void render(Application* app) {
     SDL_RenderFillRect(app->renderer, &rect);
     }
   }
+  */
+
+  // render hanyuu bc i wanna see something cute when i'm working on this project
+  SDL_FRect rect = {0, 0, 480, 480};
+  SDL_RenderTexture(app->renderer, hanyuu, NULL, &rect);
   
   // render the current menu
-  render_screen(app->renderer, screen);
+  render_screen(app, screen);
 }
