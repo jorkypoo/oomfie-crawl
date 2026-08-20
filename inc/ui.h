@@ -28,6 +28,9 @@ struct Element {
 };
 
 
+/* ===== beginning of elements ===== */
+
+
 typedef struct Button Button;
 struct Button {
   Element base;
@@ -35,6 +38,9 @@ struct Button {
   SDL_Texture* tex_default;
   SDL_Texture* tex_hovered;
   SDL_Texture* tex_clicked;
+
+  // char* text;
+  // size_t text_len;
   
   void (*callback)(void* userdata); 
   void* userdata;
@@ -51,6 +57,18 @@ struct Label {
   char* text;
   size_t text_len;
 };
+
+
+typedef struct Texture Texture;
+struct Texture {
+  Element base;
+
+  SDL_Texture tex;
+};
+
+
+/* ===== end of elements ===== */
+
 
 // menus are made up of elements
 typedef struct Menu Menu;
@@ -118,6 +136,9 @@ void add_label_bg_color(Label* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 void handle_label_event(mouse_position* mpos, Element* e, SDL_Event* event);
 void render_label(Application* app, Element* e);
 void free_label(Element* e);
+
+/* ===== texture functions ===== */
+
 
 
 /* ===== menu functions ===== */ 

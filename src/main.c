@@ -23,6 +23,7 @@ int main(int argc, char* argv[]) {
 
   if (!init_global_font(&app, "assets/monogram.ttf", 32, 255, 255, 255))
     SDL_Log("font not initialised: %s", SDL_GetError());
+  specify_alt_font_color(&app, 255, 128, 0, 255);
   
   menu = get_menu(app.renderer, 0);
   screen = init_screen(menu);

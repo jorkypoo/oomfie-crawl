@@ -45,6 +45,7 @@ struct Application {
   TTF_Font*     font;         // global font
 
   SDL_Color font_color;
+  SDL_Color alt_font_color; // for selected text and such, so it is not built into the engine code
   float font_size;
 
   // window dimensions - set to and kept at BASE_WIDTH & HEIGHT in init()
@@ -92,6 +93,9 @@ void quit_game(Application* app);
 
 // add a .ttf file & initialise it as the game's global font
 int init_global_font(Application* app, char* path, float px, Uint8 r, Uint8 g, Uint8 b);
+
+// specifies an alternative font color - optional, as the default is oragne
+void specify_alt_font_color(Application* app, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
 // wrapper to set the rendering target to the game texture
 void init_rendering(Application* app); // MUST BE CALLED BEFORE CUSTOM RENDERING CODE

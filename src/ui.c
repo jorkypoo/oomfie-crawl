@@ -370,10 +370,16 @@ void render_label(Application* app, Element* e) {
 
   // render text
   if (!t->text) return;
-  SDL_Color white = {255, 255, 255, 255};
+
+  // use the game's alt font color for when text is hovered
+  // delete later - this feature should be useful for buttons only tbh
+  SDL_Color font_color = app->font_color;
+  if (t->base.hovered)
+    font_color = app->alt_font_color;
+
   SDL_FRect drect;
 
-  SDL_Surface* s = TTF_RenderText_Solid(app->font, t->text, 0, white);
+  SDL_Surface* s = TTF_RenderText_Solid(app->font, t->text, 0, font_color);
   SDL_Texture* d = SDL_CreateTextureFromSurface(app->renderer, s);
   SDL_DestroySurface(s);
 
