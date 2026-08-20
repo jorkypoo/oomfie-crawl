@@ -14,6 +14,7 @@ Menu* menu = NULL;
 Screen* screen = NULL;
 Application app = { 0 };
 
+// ME FUCKING AROUND
 SDL_Texture* hanyuu = NULL;
 
 
@@ -28,20 +29,20 @@ int main(int argc, char* argv[]) {
   menu = get_menu(app.renderer, 0);
   screen = init_screen(menu);
 
+  // ME FUCKING AROUND
   hanyuu = create_tex(app.renderer, "assets/hanyuu_bg.png");
 
+  /* ===== main game loop ===== */
   while (app.running) {
     input(&app);
-
     init_rendering(&app); // this function is engine code and must be called before user defined rendering
-    
     render(&app);
-
     upscale_game(&app); // engine code to be called after rendering code
-
-    // fps shit
-    SDL_Delay(30/1000);
+    SDL_Delay(30/1000); // encapsulate this into one function that the user doesn't have to care about
+    // more engine code here required to update shit at the end of each frame - call deferred
   }
+
+  // cleanup
   free_screen(screen);
   quit_game(&app);
   return 0;
@@ -51,10 +52,10 @@ int main(int argc, char* argv[]) {
 void input(Application *app) {
   SDL_Event e;
 
-  char* current_res = get_current_game_resolution(app);
+  //char* current_res = get_current_game_resolution(app);
   get_scaled_mouse_coords(app);
 
-  // handle possible screen changes
+  // handle possible screen changes - my current call_deferred
   handle_screen_updates(screen);
 
   Menu* tmp = NULL;
@@ -77,8 +78,7 @@ void input(Application *app) {
             break;
           case SDLK_F1:
             if (app->borderless) break;
-            current_res = scroll_game_resolutions(app);
-            //SDL_Log("%s", current_res);
+            //current_res = scroll_game_resolutions(app);
             break;
           case SDLK_F2:
             toggle_borderless_mode(app);
@@ -86,7 +86,8 @@ void input(Application *app) {
           case SDLK_F3:
             // toggle_fullscreen_mode(game); // fullscreen not worky wah
             break;
-          case SDLK_F8:
+          /*
+            case SDLK_F8:
             tmp = get_menu(app->renderer, 0);
             if (!tmp)
               break;
@@ -104,6 +105,7 @@ void input(Application *app) {
               SDL_Log("error switching menus");
 
             break;
+          */
         }
     }
   
@@ -129,6 +131,7 @@ void render(Application* app) {
   */
 
   // render hanyuu bc i wanna see something cute when i'm working on this project
+  // ME FUCKING AROUND
   SDL_FRect rect = {0, 0, 480, 480};
   SDL_RenderTexture(app->renderer, hanyuu, NULL, &rect);
   
