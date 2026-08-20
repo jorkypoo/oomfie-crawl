@@ -31,6 +31,7 @@ struct Element {
 /* ===== beginning of elements ===== */
 
 
+// a button with definable callbacks that can operate on user defined data
 typedef struct Button Button;
 struct Button {
   Element base;
@@ -39,14 +40,16 @@ struct Button {
   SDL_Texture* tex_hovered;
   SDL_Texture* tex_clicked;
 
-  // char* text;
-  // size_t text_len;
+  char* text;
+  size_t text_len;
   
   void (*callback)(void* userdata); 
   void* userdata;
 };
 
 
+// a label for drawing a *single* line of text with a background tex/color
+// centres text within it's rect automatically
 typedef struct Label Label;
 struct Label {
   Element base;
@@ -59,11 +62,12 @@ struct Label {
 };
 
 
+// probably the simplest element: a texture... that's it!
 typedef struct Texture Texture;
 struct Texture {
   Element base;
 
-  SDL_Texture tex;
+  SDL_Texture* tex;
 };
 
 
@@ -71,6 +75,7 @@ struct Texture {
 
 
 // menus are made up of elements
+// menu elements are drawn in the order you add them - first first, last last - so watch for overlaps!
 typedef struct Menu Menu;
 struct Menu {
   Element** elements;
@@ -79,11 +84,13 @@ struct Menu {
 };
 
 // and screens are made up of a menu and a game screen
+// this is primarily what the user will be operating with
 typedef struct Screen Screen;
 struct Screen {
   //Game* current_game;
   Menu* current_menu;
 
+  // bit ugly but these are helpers for changing menus/games at the end of each frame
   int cur_menu;
   int prv_menu;
   int cur_game;
@@ -139,7 +146,15 @@ void free_label(Element* e);
 
 /* ===== texture functions ===== */
 
+// initialise texture with the provided image's native w*h or a defined w*h
+// specifying dimensions will not render the texture nicely, however
+// please use only one per element
+Texture* init_texture(SDL_Renderer* r, char* path, float x, float y);
+Texture* init_texture_dimensions(SDL_Renderer* r, char* path, float x, float y, float w, float h);
 
+void handle_texture_event(mouse_position* mpos, Element* e, SDL_Event* event);
+void render_texture(Application* app, Element* e);
+void destroy_texture(Element* e);
 
 /* ===== menu functions ===== */ 
 

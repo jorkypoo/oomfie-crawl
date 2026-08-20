@@ -15,19 +15,24 @@ void change_menu_to_options(void* userdata) {
 Menu* get_main_menu(SDL_Renderer* r) {
   if (!r) return NULL;  
 
-  Button* tb = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_to_options, NULL);
-  if (!tb) return NULL;
+  Button* tb1 = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_to_options, NULL);
+  if (!tb1) return NULL;
 
-  Label* tl = init_label(r, 560, 0, 80, 48, "hello", NULL);
+  Label* tl1 = init_label(r, 560, 0, 80, 48, "hello", NULL);
 
   Label* tl2 = init_label(r, 480, 48, 5*16, 32, "hello", NULL);
+
+  Texture* tt1 = init_texture(r, "assets/hig_th_sprites.png", 480, 128);
+  Texture* tt2 = init_texture_dimensions(r, "assets/hig_th_sprites.png", 480, 160, 64, 64);
   
   Menu* dest = init_menu();
   if (!dest) return NULL;
 
-  if (!add_element_to_menu(dest, &tb->base)) return NULL;
-  if (!add_element_to_menu(dest, &tl->base)) return NULL;
+  if (!add_element_to_menu(dest, &tb1->base)) return NULL;
+  if (!add_element_to_menu(dest, &tl1->base)) return NULL;
   if (!add_element_to_menu(dest, &tl2->base)) return NULL;
+  if (!add_element_to_menu(dest, &tt1->base)) return NULL;
+  if (!add_element_to_menu(dest, &tt2->base)) return NULL;
 
   return dest;
 }

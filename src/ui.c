@@ -409,6 +409,70 @@ void free_label(Element* e) {
   free(dest);
 }
 
+/* texture shit */
+
+Texture* init_texture(SDL_Renderer* r, char* path, float x, float y) {
+  if (!r || !path) return NULL;
+
+  Texture* dest = malloc(sizeof(Texture));
+  if (!dest) return NULL;
+
+  dest->tex = create_tex(r, path);
+  if (!dest->tex) return NULL;
+
+  SDL_GetTextureSize(dest->tex, &dest->base.rect.w, &dest->base.rect.h);
+  dest->base.rect.x = x; dest->base.rect.y = y;
+  dest->base.hovered = 0; dest->base.clicked = 0;
+
+  dest->base.handle_event = handle_texture_event;
+  dest->base.draw = render_texture;
+  dest->base.destroy = destroy_texture;
+
+  return dest;
+}
+
+Texture* init_texture_dimensions(SDL_Renderer* r, char* path, float x, float y, float w, float h) {
+  if (!r || !path) return NULL;
+
+  Texture* dest = malloc(sizeof(Texture));
+  if (!dest) return NULL;
+
+  dest->tex = create_tex(r, path);
+  if (!dest->tex) return NULL;
+
+  dest->base.rect.w = w; dest->base.rect.h = h;
+  dest->base.rect.x = x; dest->base.rect.y = y;
+  dest->base.hovered = 0; dest->base.clicked = 0;
+
+  dest->base.handle_event = handle_texture_event;
+  dest->base.draw = render_texture;
+  dest->base.destroy = destroy_texture;
+
+  return dest;
+}
+
+void handle_texture_event(mouse_position* mpos, Element* e, SDL_Event* event) {
+  if (!e || !event) return;
+
+  Texture* tex = (Texture*)e;
+}
+
+void render_texture(Application* app, Element* e) {
+  if (!e || !app) return;
+
+  Texture* t = (Texture*)e;
+
+  SDL_RenderTexture(app->renderer, t->tex, NULL, &t->base.rect);
+}
+
+void destroy_texture(Element* e) {
+  if (!e) return;
+
+  Texture* t = (Texture*)e;
+  if (t->tex) SDL_DestroyTexture(t->tex);
+  free(t);
+}
+
 /* menu shit */
 
 Menu* init_menu() {

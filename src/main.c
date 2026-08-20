@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
     upscale_game(&app); // engine code to be called after rendering code
 
     // fps shit
-    SDL_Delay(15/1000);
+    SDL_Delay(30/1000);
   }
   free_screen(screen);
   quit_game(&app);
@@ -126,6 +126,7 @@ void render(Application* app) {
     }
   }
   */
+
   // render hanyuu bc i wanna see something cute when i'm working on this project
   SDL_FRect rect = {0, 0, 480, 480};
   SDL_RenderTexture(app->renderer, hanyuu, NULL, &rect);
