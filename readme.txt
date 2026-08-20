@@ -4,12 +4,25 @@ setup: decent makefile exists; just run make
 for examples, see menu.c and the main function
 still a work-in-progress
 
-notes:
+Features:
   - f1 to cycle resolutions and f2 to shift to borderless
   - ui.c, filesystem.c & window.c act as engine code, so please don't change them without reason
   - while (running) loop look must be set up in a specific way; again, see main function
-  - buttons can be initialised from a csv file; follows pattern: x,y,w,h,p1,p2,p3
+  - various menu elements can be initialised: buttons, text labels and basic textures
+  - csv init support for all elements will be done soon, im just lazy
 
 TODO:
-  - create a base "element" struct which different ui elements inherit from
-  - allows for menus to be made up of textboxes, bars, textures and buttons
+  - add the fucking fps code dude
+  - csv support for all elements
+  - i'd like fullscreen mode to work....
+  - pass the app into event handling instead of just the mouse position
+  - add a textbox that allows for wrapped text - for item descriptions and such
+  - maybe a deferred call system: allows functions to be called after all the...
+  ...frame's code has been executed. would help with changing menus and future shit...
+  ...i imagine this would mostly be hard coded stuff yk
+  - allow for user to change keyboard inputs/select between various input maps
+
+My Notes:
+  - call deferred could simply be a struct attached to the app which contains some...
+  ...booleans that you can flip. then, at the end of the frame, check to see what...
+  ...functions need to be run

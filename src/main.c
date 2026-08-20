@@ -107,8 +107,9 @@ void input(Application *app) {
         }
     }
   
-  // handle input RE current menu
+  // handle input of current menu
   handle_screen_input(&app->mouse_pos, screen, &e);
+  // handle_screen_input(app, screen, &e); // looks nicer, doesn't it?
   }
 }
 
