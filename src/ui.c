@@ -390,6 +390,117 @@ Label* init_label(SDL_Renderer* r, float x, float y, float w, float h, char* tex
   return dest;
 }
 
+// x,y,w,h,text,txpath,r,g,b,a
+Label* init_label_offset(SDL_Renderer* r, char* path, int offset) {
+  if (!r || !path) return NULL;
+  
+  char* bs = get_line_offset(path, offset);
+  if (!bs) return NULL;
+
+  // to avoid a memory leak this becomes a lot more annoying
+  // grab xywh values
+  float x, y, w, h;
+  char* tx = get_delimited_value(bs, DELIMITER, 0);
+  char* ty = get_delimited_value(bs, DELIMITER, 1);
+  char* tw = get_delimited_value(bs, DELIMITER, 2);
+  char* th = get_delimited_value(bs, DELIMITER, 3);
+
+  x = atof(tx); free(tx);
+  y = atof(ty); free(ty);
+  w = atof(tw); free(tw);
+  h = atof(th); free(th);
+
+  // get text and texpath
+  char* text = get_delimited_value(bs, DELIMITER, 4);
+  if (!text) return NULL;
+
+  char* texpath = get_delimited_value(bs, DELIMITER, 5);
+  if (!texpath)
+    return NULL;
+
+  // texture path can be not set with these keywords
+  if (!strcmp(texpath, "notex") || !strcmp(texpath, "0")) {
+    free(texpath);
+    texpath = NULL;
+  }
+
+  Label* dest = init_label(r, x, y, w, h, text, texpath);
+  if (!dest) return NULL;
+
+  int c, g, b, a;
+  char* tc = get_delimited_value(bs, DELIMITER, 6); 
+  char* tg = get_delimited_value(bs, DELIMITER, 7);
+  char* tb = get_delimited_value(bs, DELIMITER, 8);
+  char* ta = get_delimited_value(bs, DELIMITER, 9);
+
+  c = atoi(tc); free(tc);
+  g = atoi(tg); free(tg);
+  b = atoi(tb); free(tb);
+  a = atoi(ta); free(ta);
+
+  if (a != 0)
+    add_label_bg_color(dest, c, g, b, a);
+
+  free(bs);
+  if (text) free(text);
+  if (texpath) free(texpath);
+  return dest;
+}
+
+Label* init_label_match(SDL_Renderer* r, char* path, char* match) {
+  if (!r || !path) return NULL;
+  
+  char* bs = get_line_match(path, match);
+  if (!bs) return NULL;
+
+  float x, y, w, h;
+  char* tx = get_delimited_value(bs, DELIMITER, 0);
+  char* ty = get_delimited_value(bs, DELIMITER, 1);
+  char* tw = get_delimited_value(bs, DELIMITER, 2);
+  char* th = get_delimited_value(bs, DELIMITER, 3);
+
+  x = atof(tx); free(tx);
+  y = atof(ty); free(ty);
+  w = atof(tw); free(tw);
+  h = atof(th); free(th);
+
+  // get text and texpath
+  char* text = get_delimited_value(bs, DELIMITER, 4);
+  if (!text) return NULL;
+
+  char* texpath = get_delimited_value(bs, DELIMITER, 5);
+  if (!texpath)
+    return NULL;
+
+  // texture path can be not set with these keywords
+  if (!strcmp(texpath, "notex") || !strcmp(texpath, "0")) {
+    free(texpath);
+    texpath = NULL;
+  }
+
+  Label* dest = init_label(r, x, y, w, h, text, texpath);
+  if (!dest) return NULL;
+
+  int c, g, b, a;
+  char* tc = get_delimited_value(bs, DELIMITER, 6); 
+  char* tg = get_delimited_value(bs, DELIMITER, 7);
+  char* tb = get_delimited_value(bs, DELIMITER, 8);
+  char* ta = get_delimited_value(bs, DELIMITER, 9);
+
+  c = atoi(tc); free(tc);
+  g = atoi(tg); free(tg);
+  b = atoi(tb); free(tb);
+  a = atoi(ta); free(ta);
+
+  if (a != 0)
+    add_label_bg_color(dest, c, g, b, a);
+
+  free(bs);
+  if (text) free(text);
+  if (texpath) free(texpath);
+  return dest;
+}
+
 void add_label_bg_color(Label* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
   t->color.r = r;
   t->color.g = g;
@@ -416,13 +527,13 @@ void render_label(Application* app, Element* e) {
   Label* t = (Label*)e;
 
   // render bg
-  if (t->bg) { // render background, or a default 
+  if (t->bg) { // render background texture 
     SDL_RenderTexture(app->renderer, t->bg, NULL, &t->base.rect);
-  } else if (t->color.a != 0) { // used color, if it was added
+  } else if (t->color.a != 0) { // if texture not set, use color if it was added
     SDL_SetRenderDrawColor(app->renderer, t->color.r, t->color.g, t->color.b, t->color.a);
     SDL_RenderFillRect(app->renderer, &t->base.rect);
-  } else {
-    SDL_SetRenderDrawColor(app->renderer, 0, 255, 0, 255);
+  } else { // else, render some random background...or nothing? hmm
+    SDL_SetRenderDrawColor(app->renderer, 255, 255, 0, 255);
     SDL_RenderFillRect(app->renderer, &t->base.rect);
   }
 

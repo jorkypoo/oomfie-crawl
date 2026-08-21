@@ -137,6 +137,11 @@ void render_simple_button(SDL_Renderer* renderer, Button* target, Uint8 r, Uint8
 Label* init_label(SDL_Renderer* r, float x, float y, float w, float h, char* text, char* texture_path);
 void add_label_bg_color(Label* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
+// create label from csv: x,y,w,h,text,texpath,r,g,b,a
+// texpath,r,g,b,a can be 0 to be not set
+Label* init_label_offset(SDL_Renderer* r, char* path, int offset);
+Label* init_label_match(SDL_Renderer* r, char* path, char* offset);
+
 void handle_label_event(mouse_position* mpos, Element* e, SDL_Event* event);
 void render_label(Application* app, Element* e);
 void free_label(Element* e);

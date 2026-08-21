@@ -6,6 +6,7 @@
 #define BTN_PATH2 "assets/button_pressed.png"
 
 #define BTN_INIT_FILE "btns.csv"
+#define LBL_INIT_FILE "labels.csv"
 
 
 void change_menu_to_options(void* userdata) { 
@@ -18,8 +19,8 @@ Menu* get_main_menu(SDL_Renderer* r) {
   Button* tb1 = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_to_options, NULL);
   Button* tb2 = init_button_offset(r, BTN_INIT_FILE, 1, change_menu_to_options, NULL);
 
-  Label* tl1 = init_label(r, 560, 0, 80, 48, "hello", NULL);
-  Label* tl2 = init_label(r, 480, 48, 80, 32, "hello", NULL);
+  Label* tl1 = init_label_offset(r, LBL_INIT_FILE, 0);
+  Label* tl2 = init_label_offset(r, LBL_INIT_FILE, 1);
 
   Texture* tt1 = init_texture(r, "assets/hig_th_sprites.png", 480, 128);
   Texture* tt2 = init_texture_dimensions(r, "assets/hig_th_sprites.png", 480, 160, 64, 64);
