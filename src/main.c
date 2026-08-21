@@ -79,6 +79,7 @@ void input(Application *app) {
           case SDLK_F1:
             if (app->borderless) break;
             //current_res = scroll_game_resolutions(app);
+            scroll_game_resolutions(app);
             break;
           case SDLK_F2:
             toggle_borderless_mode(app);

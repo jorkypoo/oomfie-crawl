@@ -13,7 +13,6 @@ Features:
 
 TODO:
   - add the fucking fps code dude
-  - csv support for all elements
   - i'd like fullscreen mode to work....
   - pass the app into event handling instead of just the mouse position
   - add a textbox that allows for wrapped text - for item descriptions and such
@@ -26,3 +25,4 @@ My Notes:
   - call deferred could simply be a struct attached to the app which contains some...
   ...booleans that you can flip. then, at the end of the frame, check to see what...
   ...functions need to be run
+  - sagu also has an idea that's more complicated but would work better
