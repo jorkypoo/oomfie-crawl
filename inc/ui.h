@@ -154,6 +154,9 @@ void free_label(Element* e);
 Texture* init_texture(SDL_Renderer* r, char* path, float x, float y);
 Texture* init_texture_dimensions(SDL_Renderer* r, char* path, float x, float y, float w, float h);
 
+Texture* init_texture_offset(SDL_Renderer* r, char* path, int offset);
+Texture* init_texture_match(SDL_Renderer* r, char* path, char* match);
+
 void handle_texture_event(mouse_position* mpos, Element* e, SDL_Event* event);
 void render_texture(Application* app, Element* e);
 void destroy_texture(Element* e);

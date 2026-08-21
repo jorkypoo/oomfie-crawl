@@ -7,6 +7,7 @@
 
 #define BTN_INIT_FILE "btns.csv"
 #define LBL_INIT_FILE "labels.csv"
+#define TEX_INIT_FILE "tex.csv"
 
 
 void change_menu_to_options(void* userdata) { 
@@ -22,8 +23,8 @@ Menu* get_main_menu(SDL_Renderer* r) {
   Label* tl1 = init_label_offset(r, LBL_INIT_FILE, 0);
   Label* tl2 = init_label_offset(r, LBL_INIT_FILE, 1);
 
-  Texture* tt1 = init_texture(r, "assets/hig_th_sprites.png", 480, 128);
-  Texture* tt2 = init_texture_dimensions(r, "assets/hig_th_sprites.png", 480, 160, 64, 64);
+  Texture* tt1 = init_texture_offset(r, TEX_INIT_FILE, 0);
+  Texture* tt2 = init_texture_offset(r, TEX_INIT_FILE, 1);
   
   Menu* dest = init_menu();
   if (!dest) return NULL;

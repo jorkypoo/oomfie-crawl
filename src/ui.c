@@ -156,11 +156,18 @@ Button* init_button_offset(SDL_Renderer* r, char* path, int offset, void (*callb
   // where hov_path and clk_path can be omitted, or 0 - representing null
   char* bs = get_line_offset(path, offset);
   if (!bs) return NULL;
-  
-  float x = atof(get_delimited_value(bs, DELIMITER, 0));
-  float y = atof(get_delimited_value(bs, DELIMITER, 1));
-  float w = atof(get_delimited_value(bs, DELIMITER, 2));
-  float h = atof(get_delimited_value(bs, DELIMITER, 3));
+
+  float x, y, w, h;
+  char* tx = get_delimited_value(bs, DELIMITER, 0);
+  char* ty = get_delimited_value(bs, DELIMITER, 1);
+  char* tw = get_delimited_value(bs, DELIMITER, 2);
+  char* th = get_delimited_value(bs, DELIMITER, 3);
+
+  x = atof(tx); free(tx);
+  y = atof(ty); free(ty);
+  w = atof(tw); free(tw);
+  h = atof(th); free(th);
+
   Button* dest = init_button(x,y,w,h,callback,userdata);
 
   // get the button text at offset 4 & assign keywords to not draw text on button
@@ -213,10 +220,17 @@ Button* init_button_match(SDL_Renderer* r, char* path, char* match, void (*callb
   char* bs = get_line_match(path, match);
   if (!bs) return NULL;
 
-  float x = atof(get_delimited_value(bs, DELIMITER, 0));
-  float y = atof(get_delimited_value(bs, DELIMITER, 1));
-  float w = atof(get_delimited_value(bs, DELIMITER, 2));
-  float h = atof(get_delimited_value(bs, DELIMITER, 3));
+  float x, y, w, h;
+  char* tx = get_delimited_value(bs, DELIMITER, 0);
+  char* ty = get_delimited_value(bs, DELIMITER, 1);
+  char* tw = get_delimited_value(bs, DELIMITER, 2);
+  char* th = get_delimited_value(bs, DELIMITER, 3);
+
+  x = atof(tx); free(tx);
+  y = atof(ty); free(ty);
+  w = atof(tw); free(tw);
+  h = atof(th); free(th);
+
   Button* dest = init_button(x,y,w,h,callback,userdata);
 
   char* txt = get_delimited_value(bs, DELIMITER, 4);
@@ -605,6 +619,39 @@ Texture* init_texture_dimensions(SDL_Renderer* r, char* path, float x, float y, 
   dest->base.draw = render_texture;
   dest->base.destroy = destroy_texture;
 
+  return dest;
+}
+
+Texture* init_texture_offset(SDL_Renderer* r, char* path, int offset) {
+  if (!r) return NULL;
+
+  char* bs = get_line_offset(path, offset);
+  if (!bs) return NULL;
+  
+  float x, y, w, h;
+  char* tx = get_delimited_value(bs, DELIMITER, 0);
+  char* ty = get_delimited_value(bs, DELIMITER, 1);
+  char* tw = get_delimited_value(bs, DELIMITER, 2);
+  char* th = get_delimited_value(bs, DELIMITER, 3);
+
+  x = atof(tx); free(tx);
+  y = atof(ty); free(ty);
+  w = atof(tw); free(tw);
+  h = atof(th); free(th);
+
+  char* texpath = get_delimited_value(bs, DELIMITER, 4);
+  if (!texpath) return NULL;
+
+  Texture* dest;
+  if (w == 0 && h == 0) { // use native texture dimensions
+    dest = init_texture(r, texpath, x, y);
+  } else { // use the specified dimensions
+    dest = init_texture_dimensions(r, texpath, x, y, w, h);
+  }
+  if (!dest) return NULL;
+
+  free(bs);
+  if (texpath) free(texpath);
   return dest;
 }
 
