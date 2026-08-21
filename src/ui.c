@@ -655,6 +655,39 @@ Texture* init_texture_offset(SDL_Renderer* r, char* path, int offset) {
   return dest;
 }
 
+Texture* init_texture_match(SDL_Renderer* r, char* path, char* match) {
+  if (!r) return NULL;
+
+  char* bs = get_line_match(path, match);
+  if (!bs) return NULL;
+  
+  float x, y, w, h;
+  char* tx = get_delimited_value(bs, DELIMITER, 0);
+  char* ty = get_delimited_value(bs, DELIMITER, 1);
+  char* tw = get_delimited_value(bs, DELIMITER, 2);
+  char* th = get_delimited_value(bs, DELIMITER, 3);
+
+  x = atof(tx); free(tx);
+  y = atof(ty); free(ty);
+  w = atof(tw); free(tw);
+  h = atof(th); free(th);
+
+  char* texpath = get_delimited_value(bs, DELIMITER, 4);
+  if (!texpath) return NULL;
+
+  Texture* dest;
+  if (w == 0 && h == 0) { // use native texture dimensions
+    dest = init_texture(r, texpath, x, y);
+  } else { // use the specified dimensions
+    dest = init_texture_dimensions(r, texpath, x, y, w, h);
+  }
+  if (!dest) return NULL;
+
+  free(bs);
+  if (texpath) free(texpath);
+  return dest;
+}
+
 void handle_texture_event(mouse_position* mpos, Element* e, SDL_Event* event) {
   if (!e || !event) return;
 
