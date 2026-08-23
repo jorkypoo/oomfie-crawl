@@ -27,16 +27,16 @@ void draw_element(Application* app, Element* e) {
   e->draw(app, e);
 }
 
-void handle_element_event(mouse_position* mpos, Element* e, SDL_Event* ev) {
+void handle_element_event(Application* app, Element* e, SDL_Event* ev) {
   if (!e)
     return;
 
-  e->hovered = on_element(e, mpos->x, mpos->y);
+  e->hovered = on_element(e, app->mouse_pos.x, app->mouse_pos.y);
 
   if (!e->handle_event)
     return;
 
-  e->handle_event(mpos, e, ev);
+  e->handle_event(app, e, ev);
 }
 
 void destroy_element(Element* e) {
@@ -269,8 +269,8 @@ Button* init_button_match(SDL_Renderer* r, char* path, char* match, void (*callb
   return dest;
 }
 
-void handle_button_event(mouse_position* mpos, Element* e, SDL_Event* event) {
-  if (!mpos || !e || !event) return;
+void handle_button_event(Application* app, Element* e, SDL_Event* event) {
+  if (!app || !e || !event) return;
 
   Button* b = (Button*)e;
 
@@ -526,7 +526,7 @@ void add_label_bg_color(Label* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
     t->color.a = a;
 }
 
-void handle_label_event(mouse_position* mpos, Element* e, SDL_Event* event) {
+void handle_label_event(Application* app, Element* e, SDL_Event* event) {
   if (!e) return;
 
   Label* t = (Label*)e;
@@ -688,7 +688,7 @@ Texture* init_texture_match(SDL_Renderer* r, char* path, char* match) {
   return dest;
 }
 
-void handle_texture_event(mouse_position* mpos, Element* e, SDL_Event* event) {
+void handle_texture_event(Application* app, Element* e, SDL_Event* event) {
   if (!e || !event) return;
 
   Texture* tex = (Texture*)e;
@@ -748,7 +748,7 @@ int add_element_to_menu(Menu* menu, Element* e) {
   return 1;
 }
 
-void handle_menu_event(mouse_position* mpos, Menu* menu, SDL_Event* e) {
+void handle_menu_event(Application* app, Menu* menu, SDL_Event* e) {
   if (!menu) return;
   
   for (int i = 0; i < menu->count; i++) {
@@ -756,7 +756,7 @@ void handle_menu_event(mouse_position* mpos, Menu* menu, SDL_Event* e) {
       SDL_Log("warning! button no. %d in menu is...invalid?", i);
       continue;
     }
-    handle_element_event(mpos, menu->elements[i], e);
+    handle_element_event(app, menu->elements[i], e);
   }
 }
 
@@ -819,8 +819,8 @@ int update_screen_current_menu(Screen* s, Menu* m) {
 }
 
 
-void handle_screen_input(mouse_position* mpos, Screen* s, SDL_Event* e) {
-  handle_menu_event(mpos, s->current_menu, e);
+void handle_screen_input(Application* app, Screen* s, SDL_Event* e) {
+  handle_menu_event(app, s->current_menu, e);
 }
 
 

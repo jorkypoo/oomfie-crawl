@@ -22,7 +22,7 @@ struct Element {
   int hovered;
   int clicked;
 
-  void (*handle_event)(mouse_position* mpos, Element* e, SDL_Event* ev);
+  void (*handle_event)(Application* app, Element* e, SDL_Event* ev);
   void (*draw)(Application* app, Element* e);
   void (*destroy)(Element* e);
 };
@@ -104,7 +104,7 @@ SDL_Texture* create_tex(SDL_Renderer* renderer, char* path);
 
 // basically the menu calls these functions, which calls the elements given
 // function pointer to the relevant function - button calls draw_button and so on
-void handle_element_event(mouse_position* mpos, Element* e, SDL_Event* ev);
+void handle_element_event(Application* app, Element* e, SDL_Event* ev);
 void draw_element(Application* app, Element* e);
 void destroy_element(Element* e);
 
@@ -124,7 +124,7 @@ Button* init_button_offset(SDL_Renderer* r, char* path, int offset, void (*callb
 Button* init_button_match(SDL_Renderer* r, char* path, char* match, void (*callback)(void* callback_data), void* userdata);
 
 // these must take an element instead of button, which is then cast into a button
-void handle_button_event(mouse_position* mpos, Element* e, SDL_Event* event);
+void handle_button_event(Application* app, Element* e, SDL_Event* event);
 void render_button(Application* app, Element* e);
 void free_button(Element* e);
 
@@ -142,7 +142,7 @@ void add_label_bg_color(Label* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 Label* init_label_offset(SDL_Renderer* r, char* path, int offset);
 Label* init_label_match(SDL_Renderer* r, char* path, char* offset);
 
-void handle_label_event(mouse_position* mpos, Element* e, SDL_Event* event);
+void handle_label_event(Application* app, Element* e, SDL_Event* event);
 void render_label(Application* app, Element* e);
 void free_label(Element* e);
 
@@ -157,7 +157,7 @@ Texture* init_texture_dimensions(SDL_Renderer* r, char* path, float x, float y, 
 Texture* init_texture_offset(SDL_Renderer* r, char* path, int offset);
 Texture* init_texture_match(SDL_Renderer* r, char* path, char* match);
 
-void handle_texture_event(mouse_position* mpos, Element* e, SDL_Event* event);
+void handle_texture_event(Application* app, Element* e, SDL_Event* event);
 void render_texture(Application* app, Element* e);
 void destroy_texture(Element* e);
 
@@ -166,7 +166,7 @@ void destroy_texture(Element* e);
 Menu* init_menu();
 int add_element_to_menu(Menu* menu, Element* e);
 
-void handle_menu_event(mouse_position* mpos, Menu* menu, SDL_Event* e);
+void handle_menu_event(Application* app, Menu* menu, SDL_Event* e);
 void render_menu(Application* app, Menu* menu);
 void free_menu(Menu* src); 
 
@@ -176,7 +176,7 @@ Screen* init_screen(Menu* m);
 int update_screen_current_menu(Screen* s, Menu* m);
 // int update_screen_current_game(Screen* s. Game* g);
 
-void handle_screen_input(mouse_position* mpos, Screen* s, SDL_Event* e);
+void handle_screen_input(Application* app, Screen* s, SDL_Event* e);
 void render_screen(Application* app, Screen* s);
 void free_screen(Screen* s);
 
