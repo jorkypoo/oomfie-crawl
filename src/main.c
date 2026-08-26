@@ -9,6 +9,7 @@
 void input(Application* game);
 void update(Application* game);
 void render(Application* game);
+void calc_fps(Application* game);
 
 // menu is later handed off to the screen
 Menu* menu = NULL;
@@ -40,9 +41,7 @@ int main(int argc, char* argv[]) {
     render(&app);
     upscale_game(&app); // engine code to be called after rendering code
     call_deferred();
-    
-    SDL_Delay(30/1000); // encapsulate this into one function that the user doesn't have to care about
-    // more engine code here required to update shit at the end of each frame - call deferred
+    calc_fps(&app);
   }
 
   // cleanup
@@ -141,4 +140,8 @@ void render(Application* app) {
   
   // render the current menu
   render_screen(app, screen);
+}
+
+void calc_fps(Application* app) {
+  SDL_Delay(1000/60);
 }
