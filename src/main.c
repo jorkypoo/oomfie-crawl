@@ -1,6 +1,7 @@
 #include "../inc/window.h"
 #include "../inc/ui.h"
 #include "../inc/filesystem.h"
+#include "../inc/deferred.h"
 
 #include "../inc/menu.h"
 
@@ -38,6 +39,8 @@ int main(int argc, char* argv[]) {
     init_rendering(&app); // this function is engine code and must be called before user defined rendering
     render(&app);
     upscale_game(&app); // engine code to be called after rendering code
+    call_deferred();
+    
     SDL_Delay(30/1000); // encapsulate this into one function that the user doesn't have to care about
     // more engine code here required to update shit at the end of each frame - call deferred
   }
@@ -56,7 +59,7 @@ void input(Application *app) {
   get_scaled_mouse_coords(app);
 
   // handle possible screen changes - my current call_deferred
-  handle_screen_updates(screen);
+  //handle_screen_updates(screen);
 
   Menu* tmp = NULL;
   while (SDL_PollEvent(&e)) {

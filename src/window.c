@@ -129,7 +129,7 @@ int init_game(Application* game) {
   }
 
   SDL_SetTextureScaleMode(game->game_texture, SDL_SCALEMODE_NEAREST);
-  
+
   game->running = 1;
   return 1;
 }

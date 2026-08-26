@@ -6,11 +6,12 @@
  * perhaps by some state/ui manager?? idk
  * each menu will be custom made in this c file for now
  *
- * this file also doesn't represent engine code -it uses the engine to add menus
+ * this file also doesn't represent engine code - it uses the engine to add menus
  */
 
 #include "window.h"
 #include "ui.h"
+#include "deferred.h"
 
 
 #define MENU_L_BOUND 480

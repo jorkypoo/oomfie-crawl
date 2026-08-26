@@ -14,11 +14,19 @@ void change_menu_to_options(void* userdata) {
   screen->cur_menu = 1;
 }
 
+void change_menu_opt(void* userdata) {
+  Menu* tmp = get_menu(app.renderer, 1);
+  update_screen_args* args = malloc(sizeof(update_screen_args));
+  args->screen = screen; args->menu = tmp;
+  void* cast_args = (void*) args;
+  add_deferred_call(deferred_update_screen, cast_args);
+}
+
 Menu* get_main_menu(SDL_Renderer* r) {
   if (!r) return NULL;  
 
-  Button* tb1 = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_to_options, NULL);
-  Button* tb2 = init_button_offset(r, BTN_INIT_FILE, 1, change_menu_to_options, NULL);
+  Button* tb1 = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_opt, NULL);
+  Button* tb2 = init_button_offset(r, BTN_INIT_FILE, 1, change_menu_opt, NULL);
 
   Label* tl1 = init_label_offset(r, LBL_INIT_FILE, 0);
   Label* tl2 = init_label_offset(r, LBL_INIT_FILE, 1);
@@ -42,7 +50,11 @@ Menu* get_main_menu(SDL_Renderer* r) {
 
 void* callback2 = 0;
 void change_menu_to_mainmenu(void* userdata) { 
-  screen->cur_menu = 0;
+  Menu* tmp = get_menu(app.renderer, 0);
+  update_screen_args* args = malloc(sizeof(update_screen_args));
+  args->screen = screen; args->menu = tmp;
+  void* cast_args = (void*) args;
+  add_deferred_call(deferred_update_screen, cast_args);
 }
 
 Menu* get_options_menu(SDL_Renderer* renderer) {
