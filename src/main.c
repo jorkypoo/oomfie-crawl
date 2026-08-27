@@ -37,10 +37,10 @@ int main(int argc, char* argv[]) {
   /* ===== main game loop ===== */
   while (app.running) {
     input(&app);
-    init_rendering(&app); // this function is engine code and must be called before user defined rendering
+    init_rendering(&app); // engine code to be called before user defined rendering
     render(&app);
-    upscale_game(&app); // engine code to be called after rendering code
-    call_deferred();
+    upscale_game(&app);   // engine code to be called after rendering code
+    call_deferred();      // engine code to be called after frame code & before fps management code
     calc_fps(&app);
   }
 
@@ -114,7 +114,6 @@ void input(Application *app) {
   
   // handle input of current menu
   handle_screen_input(app, screen, &e);
-  // handle_screen_input(app, screen, &e); // looks nicer, doesn't it?
   }
 }
 
@@ -143,5 +142,5 @@ void render(Application* app) {
 }
 
 void calc_fps(Application* app) {
-  SDL_Delay(1000/60);
+  SDL_Delay(1000/15);
 }

@@ -5,7 +5,6 @@ Deferred_Stack _stack = { 0 };
 void call_deferred() {
   if (_stack.top) {
     for (int i = 0; i < _stack.top; i++) {
-      SDL_Log("function %d\tindex %d", _stack.top, i);
       _stack.array[i].func(_stack.array[i].args);
       _stack.array[i].func = NULL; free(_stack.array[i].args);
     }
