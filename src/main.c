@@ -142,5 +142,5 @@ void render(Application* app) {
 }
 
 void calc_fps(Application* app) {
-  SDL_Delay(1000/15);
+  SDL_Delay(1000/30);
 }

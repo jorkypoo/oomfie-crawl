@@ -11,13 +11,16 @@
 #include "window.h"
 #include "filesystem.h"
 
-
-#define MENU_ELEMENT_COUNT (4)
+// am i using this rn i forgor
+#define MENU_ELEMENT_COUNT (12)
 
 // all ui elements inherit from element
 typedef struct Element Element;
 struct Element {
   SDL_FRect rect;
+
+  // each element can be looked up with this id
+  char id[8];
 
   int hovered;
   int clicked;
@@ -107,6 +110,8 @@ SDL_Texture* create_tex(SDL_Renderer* renderer, char* path);
 void handle_element_event(Application* app, Element* e, SDL_Event* ev);
 void draw_element(Application* app, Element* e);
 void destroy_element(Element* e);
+
+void add_element_id(Element* e, char* id);
 
 // called within handle handle_element_event to detect hovering
 // as not everything requires to be clicked, that is handled per child

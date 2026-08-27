@@ -11,6 +11,7 @@ Features:
   - csv init support for all elements will be done soon, im just lazy
 
 TODO:
+  - if no texture is specified for a button, do not render it, instead of rendering some bullshit
   - add a tag/id feature to every element so functions like modify_text(id, blah) work
   - i'd like fullscreen mode to work...
   - look into more SDL features that i can make easier for the user
