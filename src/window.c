@@ -1,6 +1,5 @@
 #include "../inc/window.h"
 
-
 resolution resolutions[] = {
   {640, 480, "640x480"},
   {960, 720, "960x720"},
@@ -98,6 +97,11 @@ int init_game(Application* game) {
     return 0;
   }
 
+  if (!MIX_Init()) {
+    SDL_Log("MIX_Init failed %s", SDL_GetError());
+    return 0;
+  }
+
   game->width = BASE_WIDTH;
   game->height = BASE_HEIGHT;
   game->resolution = 0;
@@ -142,6 +146,7 @@ void quit_game(Application* game) {
   SDL_DestroyRenderer(game->renderer);
   SDL_DestroyWindow(game->window);
 
+  MIX_Quit();
   TTF_Quit();
   SDL_Quit();
 }
