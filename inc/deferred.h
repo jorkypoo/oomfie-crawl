@@ -3,9 +3,7 @@
 
 #include "ui.h"
 
-#define MAX_DEFERRED_CALLS 16
-
-extern int poop;
+#define MAX_DEFERRED_CALLS 8
 
 
 // a function to be called by call_deferred()
@@ -40,5 +38,7 @@ typedef struct {
   Screen* screen;
   Menu* menu;
 } update_screen_args;
+
+void deferred_update_screen(void* args);
 
 #endif

@@ -2,17 +2,15 @@
 
 Deferred_Stack _stack = { 0 };
 
-int poop = 0;
-
 void call_deferred() {
-  if (_stack.top != -1) {
-    for (int i = 0; i <= _stack.top; i++) {
-      if (_stack.array[i].func != NULL) {
-        _stack.array[i].func(_stack.array[i].args);
-        _stack.array[i].func = NULL; free(_stack.array[i].args);
-      }
+  if (_stack.top) {
+    for (int i = 0; i < _stack.top; i++) {
+      SDL_Log("function %d\tindex %d", _stack.top, i);
+      _stack.array[i].func(_stack.array[i].args);
+      _stack.array[i].func = NULL; free(_stack.array[i].args);
     }
   }
+  _stack.top = 0;
 }
 
 void init_deferred_stack() {
@@ -20,12 +18,12 @@ void init_deferred_stack() {
     _stack.array[i].func = NULL;
     _stack.array->args = NULL;
   }
-  _stack.top = -1;
+  _stack.top = 0;
 }
 
 void add_deferred_call(Deferred_Function func, void* args) {
   Deferred_Call tmp = {func, args};
-  _stack.array[++_stack.top] = tmp;
+  _stack.array[_stack.top++] = tmp;
 }
 
 void deferred_update_screen(void* arg) {
