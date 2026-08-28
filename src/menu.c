@@ -22,11 +22,15 @@ void change_menu_opt(void* userdata) {
   add_deferred_call(deferred_update_screen, cast_args);
 }
 
+void button_change_label_text(void* userdata) {
+  update_label_text(screen->current_menu, "top", "poop");
+}
+
 Menu* get_main_menu(SDL_Renderer* r) {
   if (!r) return NULL;  
 
   Button* tb1 = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_opt, NULL);
-  Button* tb2 = init_button_offset(r, BTN_INIT_FILE, 1, change_menu_opt, NULL);
+  Button* tb2 = init_button_offset(r, BTN_INIT_FILE, 1, button_change_label_text, NULL);
 
   Label* tl1 = init_label_offset(r, LBL_INIT_FILE, 0);
   Label* tl2 = init_label_offset(r, LBL_INIT_FILE, 1);

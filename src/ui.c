@@ -484,7 +484,7 @@ Label* init_label_offset(SDL_Renderer* r, char* path, int offset) {
   b = atoi(tb); free(tb);
   a = atoi(ta); free(ta);
 
-  if (a != 0)
+  if (a != 1)
     add_label_bg_color(dest, c, g, b, a);
 
   free(bs);
@@ -544,7 +544,7 @@ Label* init_label_match(SDL_Renderer* r, char* path, char* match) {
   b = atoi(tb); free(tb);
   a = atoi(ta); free(ta);
 
-  if (a != 0)
+  if (a != 1)
     add_label_bg_color(dest, c, g, b, a);
 
   free(bs);
@@ -552,6 +552,19 @@ Label* init_label_match(SDL_Renderer* r, char* path, char* match) {
   if (texpath) free(texpath);
   return dest;
 }
+
+// search a menu for an ELEMENT with id and updates text to text
+void update_label_text(Menu* m, char* id, char* text) {
+  if (m->count < 1) return;
+  Label* dest = NULL;
+  for (size_t i = 0; i < m->count; i++) {
+    if (!strcmp(m->elements[i]->id, id)) {
+      dest = (Label*) m->elements[i];
+      strcpy(dest->text, text);
+      dest->text_len = strlen(dest->text) + 1;
+    }
+  }
+}  
 
 void add_label_bg_color(Label* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
   t->color.r = r;

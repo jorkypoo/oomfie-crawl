@@ -142,6 +142,10 @@ void render_simple_button(SDL_Renderer* renderer, Button* target, Uint8 r, Uint8
 Label* init_label(SDL_Renderer* r, float x, float y, float w, float h, char* text, char* texture_path);
 void add_label_bg_color(Label* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
+// updates label text with id id with text in menu m
+// maybe should be deferred
+void update_label_text(Menu* m, char* id, char* text);
+
 // create label from csv: x,y,w,h,text,texpath,r,g,b,a
 // texpath,r,g,b,a can be 0 to be not set
 Label* init_label_offset(SDL_Renderer* r, char* path, int offset);
