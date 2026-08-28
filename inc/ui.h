@@ -11,6 +11,15 @@
 #include "window.h"
 #include "filesystem.h"
 
+
+typedef struct Element Element;
+typedef struct Button Button;
+typedef struct Label Label;
+typedef struct Texture Texture;
+
+typedef struct Menu Menu;
+typedef struct Screen Screen;
+
 /* the following declarations are global/utility stuff */
 
 // am i using this rn i forgor
@@ -29,7 +38,6 @@ SDL_Texture* create_tex(SDL_Renderer* renderer, char* path);
  * ==================== */
 
 // all ui elements inherit from element
-typedef struct Element Element;
 struct Element {
   SDL_FRect rect;
 
@@ -67,7 +75,6 @@ bool on_element(Element* e, float mx, float my);
  * =================== */
 
 // a button with definable callbacks that can operate on user defined data
-typedef struct Button Button;
 struct Button {
   Element base;
 
@@ -104,7 +111,6 @@ void render_simple_button(SDL_Renderer* renderer, Button* target, Uint8 r, Uint8
 
 // a label for drawing a *single* line of text with a background tex/color
 // centres text within it's rect automatically
-typedef struct Label Label;
 struct Label {
   Element base;
 
@@ -138,7 +144,6 @@ void free_label(Element* e);
  * ===================== */
 
 // probably the simplest element: a texture... that's it!
-typedef struct Texture Texture;
 struct Texture {
   Element base;
 
@@ -170,7 +175,6 @@ void destroy_texture(Element* e);
 
 // menus are made up of elements
 // menu elements are drawn in the order you add them - first first, last last - so watch for overlaps!
-typedef struct Menu Menu;
 struct Menu {
   Element** elements;
   size_t count;
@@ -191,7 +195,6 @@ void free_menu(Menu* src);
 
 // and screens are made up of a menu and a game screen
 // this is primarily what the user will be operating with
-typedef struct Screen Screen;
 struct Screen {
   //Game* current_game;
   Menu* current_menu;
