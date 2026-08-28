@@ -273,7 +273,7 @@ void render_button(Application* app, Element* e) {
     if (b->tex_hovered)
       SDL_RenderTexture(app->renderer, b->tex_hovered, NULL, &b->base.rect);
     else
-      render_simple_button(app->renderer, b, 255, 128, 0, 255);
+      render_simple_button(app->renderer, b, 255, 255, 0, 255);
   }
   else {
     if (b->tex_default)
