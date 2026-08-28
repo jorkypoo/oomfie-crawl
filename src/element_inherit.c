@@ -1,66 +1,5 @@
 #include "../inc/ui.h"
 
-SDL_Texture* create_tex(SDL_Renderer* r, char* path) {
-  SDL_Surface* s = NULL;
-  SDL_Texture* t = NULL;
-
-  if (!path) return NULL;
-
-  s = IMG_Load(path);
-  if (!s) return NULL;
-  
-  t = SDL_CreateTextureFromSurface(r, s);
-  if (!t) return NULL;
-
-  return t;
-}
-
-/* element shit */
-
-void draw_element(Application* app, Element* e) {
-  if (!e || !e->draw)
-    return;
-
-  if (!app || !app->renderer)
-    return;
-
-  e->draw(app, e);
-}
-
-void handle_element_event(Application* app, Element* e, SDL_Event* ev) {
-  if (!e)
-    return;
-
-  e->hovered = on_element(e, app->mouse_pos.x, app->mouse_pos.y);
-
-  if (!e->handle_event)
-    return;
-
-  e->handle_event(app, e, ev);
-}
-
-void destroy_element(Element* e) {
-  if (!e)
-    return;
-
-  if (e->destroy)
-    e->destroy(e);
-}
-
-
-void add_element_id(Element* e, char* id) {
-  // id should be 8 chars long + 1 \0
-  // e->id is always set to all zeros
-  if (strlen(id) > 8) return;
-
-  strcpy(e->id, id);
-}
-
-
-bool on_element(Element* e, float mx, float my) {
-  return mx >= e->rect.x && mx <= e->rect.x + e->rect.w && my >= e->rect.y && my <= e->rect.y + e->rect.h;
-}
-
 /* button shit */
 
 Button* init_button(float x,float y,float w,float h,void(*callback)(void* data),void* data) {
@@ -334,7 +273,7 @@ void render_button(Application* app, Element* e) {
     if (b->tex_hovered)
       SDL_RenderTexture(app->renderer, b->tex_hovered, NULL, &b->base.rect);
     else
-      render_simple_button(app->renderer, b, 255, 255, 0, 255);
+      render_simple_button(app->renderer, b, 255, 128, 0, 255);
   }
   else {
     if (b->tex_default)
@@ -594,14 +533,11 @@ void render_label(Application* app, Element* e) {
   // render bg
   if (t->bg) { // render background texture 
     SDL_RenderTexture(app->renderer, t->bg, NULL, &t->base.rect);
-  } else if (t->color.a != 0) { // if texture not set, use color if it was added
+  } else if (t->color.a < 2) { // if texture not set, use color if it was added
     SDL_SetRenderDrawColor(app->renderer, t->color.r, t->color.g, t->color.b, t->color.a);
     SDL_RenderFillRect(app->renderer, &t->base.rect);
-  } else { // else, render some random background...or nothing? hmm
-    SDL_SetRenderDrawColor(app->renderer, 255, 255, 0, 255);
-    SDL_RenderFillRect(app->renderer, &t->base.rect);
-  }
-
+  } // else, render nothing
+  
   // render text
   if (!t->text) return;
 
@@ -773,137 +709,4 @@ void destroy_texture(Element* e) {
   free(t);
 }
 
-/* menu shit */
 
-Menu* init_menu() {
-  Menu* dest = malloc(sizeof(Menu));
-  if (!dest) return NULL;
-  
-  dest->count = 0;
-  dest->capacity = MENU_ELEMENT_COUNT;
-
-  dest->elements = malloc(sizeof(Element*) * MENU_ELEMENT_COUNT);
-  if (!dest->elements) {
-    printf("poop in init_menu\n");
-    return NULL;
-  }
-
-  return dest;
-}
-
-int add_element_to_menu(Menu* menu, Element* e) {
-  if (!menu || !e)
-    return 0;
-
-  if (menu->count >= menu->capacity) {
-    size_t new_capacity = menu->capacity == 0 ? MENU_ELEMENT_COUNT : menu->capacity * 2;
-    Element** new_elements = realloc(menu->elements, new_capacity * sizeof(*new_elements));
-
-    if (!new_elements)
-      return 0;
-
-    menu->elements = new_elements;
-    menu->capacity = new_capacity;
-  }
-
-  menu->elements[menu->count++] = e;
-
-  return 1;
-}
-
-void handle_menu_event(Application* app, Menu* menu, SDL_Event* e) {
-  if (!menu) return;
-  
-  for (int i = 0; i < menu->count; i++) {
-    if (!menu->elements[i]) { // just incase
-      SDL_Log("warning! button no. %d in menu is...invalid?", i);
-      continue;
-    }
-    handle_element_event(app, menu->elements[i], e);
-  }
-}
-
-void render_menu(Application* app, Menu* menu) {
-  if (!app->renderer || !menu) return;
-
-  for (int i = 0; i < menu->count; i++) {
-    if (!menu->elements[i]) { 
-      SDL_Log("warning! button no. %d in menu is...invalid?", i);
-      continue;
-    }
-    draw_element(app, menu->elements[i]);
-  }
-}
-
-void free_menu(Menu* src) {
-  if (!src) return;
-
-  free(src->elements);
-  free(src);
-}
-
-
-Screen* init_screen(Menu* m) {
-  Screen* dest = malloc(sizeof(Screen));
-  if (!dest) {
-    free_menu(m);
-    return NULL;
-  }
-
-  dest->current_menu = m;
-  //dest->current_game = g;
-
-  dest->cur_menu = 0;
-  dest->prv_menu = 0;
-
-  dest->cur_game= 0;
-  dest->prv_game = 0;
-  return dest;
-}
-
-
-void free_screen(Screen* s) {
-  if (!s) return;
-
-  free_menu(s->current_menu);
-  free(s);
-}
-
-
-int update_screen_current_menu(Screen* s, Menu* m) {
-  if (!s || !m) return 0;
-
-  if (s->current_menu != m) {
-    free_menu(s->current_menu);
-  }
-
-  s->current_menu = m;
-  return 1;
-}
-
-
-void handle_screen_input(Application* app, Screen* s, SDL_Event* e) {
-  handle_menu_event(app, s->current_menu, e);
-}
-
-
-void render_screen(Application* app, Screen* s) {
-  render_menu(app, s->current_menu);
-}
-
-
-int should_change_screen_menu(Screen* s) {
-  if (s->cur_menu != s->prv_menu) {
-    s->prv_menu = s->cur_menu;
-    return 1;
-  }
-  return 0;
-}
-
-int should_change_screen_game(Screen* s) {
-  if (s->cur_game != s->prv_menu) {
-    s->prv_game = s->cur_game;
-    return 1;
-  }
-  return 0;
-}
