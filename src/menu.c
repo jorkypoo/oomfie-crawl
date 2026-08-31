@@ -5,9 +5,9 @@
 #define BTN_PATH "assets/button_default.png"
 #define BTN_PATH2 "assets/button_pressed.png"
 
-#define BTN_INIT_FILE "btns.csv"
-#define LBL_INIT_FILE "labels.csv"
-#define TEX_INIT_FILE "tex.csv"
+#define BTN_INIT_FILE "assets/csv/btns.csv"
+#define LBL_INIT_FILE "assets/csv/labels.csv"
+#define TEX_INIT_FILE "assets/csv/tex.csv"
 
 
 void change_menu_to_options(void* userdata) { 
