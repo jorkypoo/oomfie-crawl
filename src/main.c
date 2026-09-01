@@ -34,6 +34,10 @@ int main(int argc, char* argv[]) {
   // ME FUCKING AROUND
   hanyuu = create_tex(app.renderer, "assets/hanyuu_bg.png");
 
+  // me fucking around with sdl audio
+  MIX_Audio* audio = NULL;
+  MIX_Track* track = NULL;
+
   /* ===== main game loop ===== */
   while (app.running) {
     input(&app);
