@@ -8,7 +8,7 @@
 
 #include <stdlib.h>
 
-#include "window.h"
+#include "core.h"
 #include "filesystem.h"
 
 

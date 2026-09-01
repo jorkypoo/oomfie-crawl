@@ -9,7 +9,7 @@
  * this file also doesn't represent engine code - it uses the engine to add menus
  */
 
-#include "window.h"
+#include "core.h"
 #include "ui.h"
 #include "deferred.h"
 

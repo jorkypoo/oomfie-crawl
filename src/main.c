@@ -1,4 +1,4 @@
-#include "../inc/window.h"
+#include "../inc/core.h"
 #include "../inc/ui.h"
 #include "../inc/filesystem.h"
 #include "../inc/deferred.h"

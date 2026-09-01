@@ -1,6 +1,8 @@
 #ifndef __WINDOW__
 #define __WINDOW__
 
+#include <stdlib.h>
+
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_video.h>
 #include <SDL3_ttf/SDL_ttf.h>
@@ -49,6 +51,10 @@ struct Application {
   SDL_Color alt_font_color; // for selected text and such, so it is not built into the engine code
   float font_size;
 
+  // output mixers for sfx and bg music
+  MIX_Mixer* mixer_bg;
+  MIX_Mixer* mixer_sfx;
+
   // window dimensions - set to and kept at BASE_WIDTH & HEIGHT in init()
   // the game is upscaled later so game logic should be written in terms of those macros 
   float width;
@@ -60,7 +66,7 @@ struct Application {
   int resolution; // kind of a tracker for running through the resolutions array
   int borderless; // whether the game is running in borderless or windowed
   int fullscreen; // whether the game is running in fullscreen or not
-  int running;  // for the SDL main loop
+  int running;    // for the SDL main loop
 };
 
 
@@ -86,11 +92,20 @@ void toggle_borderless_mode(Application* app);
 // currently not working, but should force display to be whatever the selected game resolution is
 void toggle_fullscreen_mode(Application* app);
 
+// wrapper to set the rendering target to the game texture
+void init_rendering(Application* app); // MUST BE CALLED BEFORE CUSTOM RENDERING CODE
+
+// scales game window up based on currently selected resolution
+// helps maintain game & ui logic at the base window dimensions
+void upscale_game(Application* app); // MUST BE CALLED AFTER CUSTOM RENDERING CODE
+
 // initialises SDL and everything and returns a game object
 int init_game(Application* app); 
 
 // cleanup
 void quit_game(Application* app);
+
+/* ===== font stuff ===== */
 
 // add a .ttf file & initialise it as the game's global font
 int init_global_font(Application* app, char* path, float px, Uint8 r, Uint8 g, Uint8 b);
@@ -98,11 +113,9 @@ int init_global_font(Application* app, char* path, float px, Uint8 r, Uint8 g, U
 // specifies an alternative font color - optional, as the default is oragne
 void specify_alt_font_color(Application* app, Uint8 r, Uint8 g, Uint8 b, Uint8 a);
 
-// wrapper to set the rendering target to the game texture
-void init_rendering(Application* app); // MUST BE CALLED BEFORE CUSTOM RENDERING CODE
+/* ===== mixer stuff ===== */
 
-// scales game window up based on currently selected resolution
-// helps maintain game & ui logic at the base window dimensions
-void upscale_game(Application* app); // MUST BE CALLED AFTER CUSTOM RENDERING CODE
+void init_app_mixers(Application* app);
+void free_app_mixers(Application* app);
 
 #endif

@@ -153,10 +153,16 @@ Button* init_button_offset(SDL_Renderer* r, char* path, int offset, void (*callb
   // so make sure you don't neglect a filepath that starts with 0
   // fucking maniac
   char* hpath = get_delimited_value(bs, DELIMITER, 7);
-  if (hpath) if (strlen(hpath) <= 1 && *hpath == '0') hpath = NULL;
+  if (hpath) if (strlen(hpath) <= 1 && *hpath == '0') {
+    free(hpath);
+    hpath = NULL;
+  }
 
   char* cpath = get_delimited_value(bs, DELIMITER, 8);
-  if (cpath) if (strlen(cpath) <= 1 && *cpath == '0') cpath = NULL;
+  if (cpath) if (strlen(cpath) <= 1 && *cpath == '0') {
+    free(cpath);
+    cpath = NULL;
+  }
 
   // if dpath was defined as a testing texture, no need to pass it to this function
   // also, it would call an error of dpath wasn't defined lolsies

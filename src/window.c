@@ -1,4 +1,4 @@
-#include "../inc/window.h"
+#include "../inc/core.h"
 
 resolution resolutions[] = {
   {640, 480, "640x480"},
@@ -134,6 +134,9 @@ int init_game(Application* game) {
 
   SDL_SetTextureScaleMode(game->game_texture, SDL_SCALEMODE_NEAREST);
 
+  // mixer inits
+  init_app_mixers(game);
+
   game->running = 1;
   return 1;
 }
@@ -141,6 +144,8 @@ int init_game(Application* game) {
 
 void quit_game(Application* game) {
   if (game->font) TTF_CloseFont(game->font);
+
+  free_app_mixers(game);
 
   SDL_DestroyTexture(game->game_texture);
   SDL_DestroyRenderer(game->renderer);
@@ -151,6 +156,34 @@ void quit_game(Application* game) {
   SDL_Quit();
 }
 
+void init_rendering(Application* game) {
+  SDL_SetRenderTarget(game->renderer, game->game_texture);
+  SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
+  SDL_RenderClear(game->renderer);
+}
+
+void upscale_game(Application* game) {
+  SDL_SetRenderTarget(game->renderer, NULL);
+  
+  float sx = game->width / BASE_WIDTH;
+  float sy = game->height / BASE_HEIGHT;
+
+  float scale = sx < sy ? sx : sy;
+
+  int draww = (int)(BASE_WIDTH * scale);
+  int drawh = (int)(BASE_HEIGHT * scale);
+
+  SDL_FRect dst = { (game->width - draww) / 2.0, (game->height - drawh) / 2.0f, draww, drawh };
+
+  SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
+  SDL_RenderClear(game->renderer);
+  
+  SDL_RenderTexture(game->renderer, game->game_texture, NULL, &dst);
+
+  SDL_RenderPresent(game->renderer);
+}
+
+/* font shit */
 
 int init_global_font(Application* app, char* path, float px, Uint8 r, Uint8 g, Uint8 b) {
   if (!app) return 0;
@@ -184,31 +217,26 @@ void specify_alt_font_color(Application* app, Uint8 r, Uint8 g, Uint8 b, Uint8 a
   app->alt_font_color.a = a;
 }
 
+/* mixer shit */
 
-void init_rendering(Application* game) {
-  SDL_SetRenderTarget(game->renderer, game->game_texture);
-  SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
-  SDL_RenderClear(game->renderer);
+void init_app_mixers(Application* app) {
+  MIX_Mixer* dest1 = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+  if (!dest1) {
+    SDL_Log("could not create a mixer from default audio device: %s", SDL_GetError());
+    return;
+  }
+
+  MIX_Mixer* dest2 = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+  if (!dest1) {
+    SDL_Log("could not create a mixer from default audio device: %s", SDL_GetError());
+    return;
+  }
+
+  app->mixer_bg = dest1;
+  app->mixer_sfx = dest2;
 }
 
-
-void upscale_game(Application* game) {
-  SDL_SetRenderTarget(game->renderer, NULL);
-  
-  float sx = game->width / BASE_WIDTH;
-  float sy = game->height / BASE_HEIGHT;
-
-  float scale = sx < sy ? sx : sy;
-
-  int draww = (int)(BASE_WIDTH * scale);
-  int drawh = (int)(BASE_HEIGHT * scale);
-
-  SDL_FRect dst = { (game->width - draww) / 2.0, (game->height - drawh) / 2.0f, draww, drawh };
-
-  SDL_SetRenderDrawColor(game->renderer, 0, 0, 0, 255);
-  SDL_RenderClear(game->renderer);
-  
-  SDL_RenderTexture(game->renderer, game->game_texture, NULL, &dst);
-
-  SDL_RenderPresent(game->renderer);
+void free_app_mixers(Application* app) {
+  MIX_DestroyMixer(app->mixer_bg);
+  MIX_DestroyMixer(app->mixer_sfx);
 }
