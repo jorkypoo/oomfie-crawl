@@ -569,7 +569,7 @@ void free_label(Element* e) {
 
   if (dest->text) free(dest->text);
   if (dest->bg)   SDL_DestroyTexture(dest->bg);
-  
+
   free(dest);
 }
 

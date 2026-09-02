@@ -65,6 +65,9 @@ void render_menu(Application* app, Menu* menu) {
 void free_menu(Menu* src) {
   if (!src) return;
 
+  for (int i = 0; i < src->count; i++) 
+    src->elements[i]->destroy(src->elements[i]);
+  
   free(src->elements);
   free(src);
 }
@@ -100,10 +103,9 @@ void free_screen(Screen* s) {
 int update_screen_current_menu(Screen* s, Menu* m) {
   if (!s || !m) return 0;
 
-  if (s->current_menu != m) {
+  if (s->current_menu != m) 
     free_menu(s->current_menu);
-  }
-
+  
   s->current_menu = m;
   return 1;
 }
