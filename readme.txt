@@ -13,7 +13,7 @@ Features:
 TODO:
   - if no texture is specified for a button, do not render it, instead of rendering some bullshit
   - i'd like fullscreen mode to work...
-  - look into more SDL features that i can make easier for the user
-  - look into the SDL3 sound library i forgot what its called
   - add a textbox that allows for wrapped text - for item descriptions and such
   - allow for user to change keyboard inputs/select between various input maps
+  - keyboard navigation for buttons, and the user can use tab maybe to swap ...
+  ... between focus on the menu and the game
