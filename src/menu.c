@@ -6,9 +6,6 @@
 #define BTN_PATH2 "assets/button_pressed.png"
 
 #define BTN_INIT_FILE "assets/csv/btns.csv"
-#define LBL_INIT_FILE "assets/csv/labels.csv"
-#define TEX_INIT_FILE "assets/csv/tex.csv"
-
 
 void change_menu_to_options(void* userdata) { 
   screen->cur_menu = 1;
@@ -26,23 +23,29 @@ void button_change_label_text(void* userdata) {
   update_label_text(screen->current_menu, "top", "poop");
 }
 
+void play_demo_sound(void* data) {
+  ;
+}
+
 Menu* get_main_menu(SDL_Renderer* r) {
   if (!r) return NULL;  
 
   Button* tb1 = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_opt, NULL);
   Button* tb2 = init_button_offset(r, BTN_INIT_FILE, 1, button_change_label_text, NULL);
+  Button* tb3 = init_button_offset(r, BTN_INIT_FILE, 2, play_demo_sound, NULL);
 
-  Label* tl1 = init_label_offset(r, LBL_INIT_FILE, 0);
-  Label* tl2 = init_label_offset(r, LBL_INIT_FILE, 1);
+  Label* tl1 = init_label_offset(r, BTN_INIT_FILE, 3);
+  Label* tl2 = init_label_offset(r, BTN_INIT_FILE, 4);
 
-  Texture* tt1 = init_texture_offset(r, TEX_INIT_FILE, 0);
-  Texture* tt2 = init_texture_offset(r, TEX_INIT_FILE, 1);
+  Texture* tt1 = init_texture_offset(r, BTN_INIT_FILE, 5);
+  Texture* tt2 = init_texture_offset(r, BTN_INIT_FILE, 6);
   
   Menu* dest = init_menu();
   if (!dest) return NULL;
 
   add_element_to_menu(dest, &tb1->base);
   add_element_to_menu(dest, &tb2->base);
+  add_element_to_menu(dest, &tb3->base);
   add_element_to_menu(dest, &tl1->base);
   add_element_to_menu(dest, &tl2->base);
   add_element_to_menu(dest, &tt1->base);

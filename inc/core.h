@@ -33,7 +33,6 @@ extern resolution resolutions[];
 
 // N.B. App struct was previously called Game lolsies
 
-
 typedef struct mouse_position mouse_position;
 struct mouse_position {
   float x;
@@ -51,9 +50,12 @@ struct Application {
   SDL_Color alt_font_color; // for selected text and such, so it is not built into the engine code
   float font_size;
 
-  // output mixers for sfx and bg music
-  MIX_Mixer* mixer_bg;
-  MIX_Mixer* mixer_sfx;
+  // output tracks for sfx and bg music
+  // most ui sounds can use MIX_PlayAudio wrappers for the most part
+  MIX_Mixer* mixer;
+  MIX_Track* music;
+  MIX_Track* misc1;
+  MIX_Track* misc2;
 
   // window dimensions - set to and kept at BASE_WIDTH & HEIGHT in init()
   // the game is upscaled later so game logic should be written in terms of those macros 
@@ -117,5 +119,7 @@ void specify_alt_font_color(Application* app, Uint8 r, Uint8 g, Uint8 b, Uint8 a
 
 void init_app_mixers(Application* app);
 void free_app_mixers(Application* app);
+
+void play_temp_audio(Application* app, char* path);
 
 #endif
