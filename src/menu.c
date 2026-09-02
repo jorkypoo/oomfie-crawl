@@ -4,6 +4,9 @@
 // filepaths for textures
 #define BTN_PATH "assets/button_default.png"
 #define BTN_PATH2 "assets/button_pressed.png"
+#define WAV_PATH "assets/yukkuri_meep.wav"
+#define SNG_PATH "assets/selection.mp3"
+#define SNG2_PATH "assets/shop.mp3"
 
 #define BTN_INIT_FILE "assets/csv/btns.csv"
 
@@ -24,21 +27,40 @@ void button_change_label_text(void* userdata) {
 }
 
 void play_demo_sound(void* data) {
-  ;
+  play_temp_audio(&app, WAV_PATH);
+}
+
+void play_demo_music(void* data) {
+  play_main_music(&app, SNG2_PATH);
+}
+
+void pause_demo_music(void* data) {
+  pause_main_music(&app, 500);
+}
+
+void resume_demo_music(void* data) {
+  resume_main_music(&app, 500);
 }
 
 Menu* get_main_menu(SDL_Renderer* r) {
-  if (!r) return NULL;  
+  if (!r) return NULL;
+
+  // this will clear any sound playing when changing menus
+  clear_app_mixers(&app);
 
   Button* tb1 = init_button_offset(r, BTN_INIT_FILE, 0, change_menu_opt, NULL);
-  Button* tb2 = init_button_offset(r, BTN_INIT_FILE, 1, button_change_label_text, NULL);
+  Button* tb2 = init_button_offset(r, BTN_INIT_FILE, 1, play_demo_music, NULL);
   Button* tb3 = init_button_offset(r, BTN_INIT_FILE, 2, play_demo_sound, NULL);
+  
 
   Label* tl1 = init_label_offset(r, BTN_INIT_FILE, 3);
   Label* tl2 = init_label_offset(r, BTN_INIT_FILE, 4);
 
   Texture* tt1 = init_texture_offset(r, BTN_INIT_FILE, 5);
   Texture* tt2 = init_texture_offset(r, BTN_INIT_FILE, 6);
+
+  Button* tb4 = init_button_offset(r, BTN_INIT_FILE, 7, pause_demo_music, NULL);
+  Button* tb5 = init_button_offset(r, BTN_INIT_FILE, 8, resume_demo_music, NULL);
   
   Menu* dest = init_menu();
   if (!dest) return NULL;
@@ -46,6 +68,8 @@ Menu* get_main_menu(SDL_Renderer* r) {
   add_element_to_menu(dest, &tb1->base);
   add_element_to_menu(dest, &tb2->base);
   add_element_to_menu(dest, &tb3->base);
+  add_element_to_menu(dest, &tb4->base);
+  add_element_to_menu(dest, &tb5->base);
   add_element_to_menu(dest, &tl1->base);
   add_element_to_menu(dest, &tl2->base);
   add_element_to_menu(dest, &tt1->base);
@@ -65,7 +89,9 @@ void change_menu_to_mainmenu(void* userdata) {
 }
 
 Menu* get_options_menu(SDL_Renderer* renderer) {
-  if (!renderer) return NULL;  
+  if (!renderer) return NULL;
+
+  clear_app_mixers(&app);  
 
   Button* tb1 = init_button(MENU_L_BOUND, 0, MENU_WIDTH, 32, change_menu_to_mainmenu, NULL);
   if (!tb1) return NULL;
@@ -83,6 +109,7 @@ Menu* get_options_menu(SDL_Renderer* renderer) {
   return dest;
 }
 
+/* am i using this anymore */
 
 Menu* get_menu(SDL_Renderer* r, screen_id choice) {
   Menu* ret = NULL;

@@ -5,3 +5,5 @@ top,480,96,80,48,hello,0,255,128,0,0
 bot,560,96,80,48,hi,0,255,128,0,0
 chuds,480,144,0,0,assets/hig_th_sprites.png
 chudu,480,176,64,64,assets/hig_th_sprites.png
+pause,480,420,30,30,p,notex
+resume,480,450,30,30,r,notex

@@ -135,7 +135,8 @@ int init_game(Application* game) {
   SDL_SetTextureScaleMode(game->game_texture, SDL_SCALEMODE_NEAREST);
 
   // mixer inits
-  init_app_mixers(game);
+  if (!init_app_mixers(game))
+    return 0;
 
   game->running = 1;
   return 1;

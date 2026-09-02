@@ -53,9 +53,10 @@ struct Application {
   // output tracks for sfx and bg music
   // most ui sounds can use MIX_PlayAudio wrappers for the most part
   MIX_Mixer* mixer;
-  MIX_Track* music;
-  MIX_Track* misc1;
-  MIX_Track* misc2;
+  MIX_Track* music_track;
+  Sint64 music_track_pos;
+  MIX_Track* misc1_track;
+  MIX_Track* misc2_track;
 
   // window dimensions - set to and kept at BASE_WIDTH & HEIGHT in init()
   // the game is upscaled later so game logic should be written in terms of those macros 
@@ -117,9 +118,26 @@ void specify_alt_font_color(Application* app, Uint8 r, Uint8 g, Uint8 b, Uint8 a
 
 /* ===== mixer stuff ===== */
 
-void init_app_mixers(Application* app);
+int init_app_mixers(Application* app);
 void free_app_mixers(Application* app);
 
+// stops and clears all sound playing on mixers - for changing levels and stuff
+void clear_app_mixers(Application* app);
+
+// fires off a temporary audio - for short sfx
 void play_temp_audio(Application* app, char* path);
+
+// plays and stores an audio track - for larger sfx files that are used
+// often & would need to be cached
+// not implemented yet & honestly not really necessary
+void play_main_audio(Application* app, char* path);
+
+// plays a looping track
+void play_main_music(Application* app, char* path);
+
+// pause/resume music track with fade in/out
+// remembers position in track on pause so resume picks back from last pos
+void pause_main_music(Application* app, Sint64 ms);
+void resume_main_music(Application* app, Sint64 ms);
 
 #endif
