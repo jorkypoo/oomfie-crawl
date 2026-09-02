@@ -1,57 +1,5 @@
 #include "../inc/ui.h"
 
-SDL_Texture* create_tex(SDL_Renderer* r, char* path) {
-  SDL_Surface* s = NULL;
-  SDL_Texture* t = NULL;
-
-  if (!path) return NULL;
-
-  s = IMG_Load(path);
-  if (!s) return NULL;
-  
-  t = SDL_CreateTextureFromSurface(r, s);
-  if (!t) return NULL;
-
-  return t;
-}
-
-/* element shit */
-
-void draw_element(Application* app, Element* e) {
-  if (!e || !e->draw)
-    return;
-
-  if (!app || !app->renderer)
-    return;
-
-  e->draw(app, e);
-}
-
-void handle_element_event(Application* app, Element* e, SDL_Event* ev) {
-  if (!e)
-    return;
-
-  e->hovered = on_element(e, app->mouse_pos.x, app->mouse_pos.y);
-
-  if (!e->handle_event)
-    return;
-
-  e->handle_event(app, e, ev);
-}
-
-void destroy_element(Element* e) {
-  if (!e)
-    return;
-
-  if (e->destroy)
-    e->destroy(e);
-}
-
-
-bool on_element(Element* e, float mx, float my) {
-  return mx >= e->rect.x && mx <= e->rect.x + e->rect.w && my >= e->rect.y && my <= e->rect.y + e->rect.h;
-}
-
 /* button shit */
 
 Button* init_button(float x,float y,float w,float h,void(*callback)(void* data),void* data) {
@@ -64,6 +12,9 @@ Button* init_button(float x,float y,float w,float h,void(*callback)(void* data),
   
   SDL_FRect r = {x, y, w, h};
   dest->base.rect = r;
+
+  char tmp[8] = {0};
+  strcpy(dest->base.id, tmp);
 
   dest->base.handle_event = handle_button_event;
   dest->base.draw = render_button;
@@ -158,10 +109,10 @@ Button* init_button_offset(SDL_Renderer* r, char* path, int offset, void (*callb
   if (!bs) return NULL;
 
   float x, y, w, h;
-  char* tx = get_delimited_value(bs, DELIMITER, 0);
-  char* ty = get_delimited_value(bs, DELIMITER, 1);
-  char* tw = get_delimited_value(bs, DELIMITER, 2);
-  char* th = get_delimited_value(bs, DELIMITER, 3);
+  char* tx = get_delimited_value(bs, DELIMITER, 1);
+  char* ty = get_delimited_value(bs, DELIMITER, 2);
+  char* tw = get_delimited_value(bs, DELIMITER, 3);
+  char* th = get_delimited_value(bs, DELIMITER, 4);
 
   x = atof(tx); free(tx);
   y = atof(ty); free(ty);
@@ -170,15 +121,23 @@ Button* init_button_offset(SDL_Renderer* r, char* path, int offset, void (*callb
 
   Button* dest = init_button(x,y,w,h,callback,userdata);
 
+  // get the id and assign it to the button
+  // must be 8 characters or less, otherwise it is discarded
+  char* ttex = get_delimited_value(bs, DELIMITER, 0);
+  if (ttex) {
+    add_element_id(&dest->base, ttex);
+    free(ttex);
+  }
+
   // get the button text at offset 4 & assign keywords to not draw text on button
-  char* txt = get_delimited_value(bs, DELIMITER, 4);
+  char* txt = get_delimited_value(bs, DELIMITER, 5);
   if (!strcmp(txt, "test") || !strcmp(txt, "notext"))
     dest->text = NULL;
   else
     init_button_text(dest, txt);
 
   // dpath must be defined; others can be empty or defined
-  char* dpath = get_delimited_value(bs, DELIMITER, 5);
+  char* dpath = get_delimited_value(bs, DELIMITER, 6);
   if (!dpath) { // button path must not be shit
       SDL_Log("default button path must be defined in %s", path);
       return NULL;
@@ -193,11 +152,17 @@ Button* init_button_offset(SDL_Renderer* r, char* path, int offset, void (*callb
   // following entries can either be omitted, or 0
   // so make sure you don't neglect a filepath that starts with 0
   // fucking maniac
-  char* hpath = get_delimited_value(bs, DELIMITER, 6);
-  if (hpath) if (strlen(hpath) <= 1 && *hpath == '0') hpath = NULL;
+  char* hpath = get_delimited_value(bs, DELIMITER, 7);
+  if (hpath) if (strlen(hpath) <= 1 && *hpath == '0') {
+    free(hpath);
+    hpath = NULL;
+  }
 
-  char* cpath = get_delimited_value(bs, DELIMITER, 7);
-  if (cpath) if (strlen(cpath) <= 1 && *cpath == '0') cpath = NULL;
+  char* cpath = get_delimited_value(bs, DELIMITER, 8);
+  if (cpath) if (strlen(cpath) <= 1 && *cpath == '0') {
+    free(cpath);
+    cpath = NULL;
+  }
 
   // if dpath was defined as a testing texture, no need to pass it to this function
   // also, it would call an error of dpath wasn't defined lolsies
@@ -221,10 +186,10 @@ Button* init_button_match(SDL_Renderer* r, char* path, char* match, void (*callb
   if (!bs) return NULL;
 
   float x, y, w, h;
-  char* tx = get_delimited_value(bs, DELIMITER, 0);
-  char* ty = get_delimited_value(bs, DELIMITER, 1);
-  char* tw = get_delimited_value(bs, DELIMITER, 2);
-  char* th = get_delimited_value(bs, DELIMITER, 3);
+  char* tx = get_delimited_value(bs, DELIMITER, 1);
+  char* ty = get_delimited_value(bs, DELIMITER, 2);
+  char* tw = get_delimited_value(bs, DELIMITER, 3);
+  char* th = get_delimited_value(bs, DELIMITER, 4);
 
   x = atof(tx); free(tx);
   y = atof(ty); free(ty);
@@ -233,13 +198,19 @@ Button* init_button_match(SDL_Renderer* r, char* path, char* match, void (*callb
 
   Button* dest = init_button(x,y,w,h,callback,userdata);
 
-  char* txt = get_delimited_value(bs, DELIMITER, 4);
+  char* ttex = get_delimited_value(bs, DELIMITER, 0);
+  if (ttex) {
+    add_element_id(&dest->base, ttex);
+    free(ttex);
+  }
+
+  char* txt = get_delimited_value(bs, DELIMITER, 5);
   if (!strcmp(txt, "test") || !strcmp(txt, "notext"))
     dest->text = NULL;
   else
     init_button_text(dest, txt);
 
-  char* dpath = get_delimited_value(bs, DELIMITER, 5);
+  char* dpath = get_delimited_value(bs, DELIMITER, 6);
   if (!dpath) { 
       SDL_Log("default button path must be defined in %s", path);
       return NULL;
@@ -251,10 +222,10 @@ Button* init_button_match(SDL_Renderer* r, char* path, char* match, void (*callb
     dpath = NULL;
   }
 
-  char* hpath = get_delimited_value(bs, DELIMITER, 6);
+  char* hpath = get_delimited_value(bs, DELIMITER, 7);
   if (hpath) if (strlen(hpath) <= 1 && *hpath == '0') hpath = NULL;
 
-  char* cpath = get_delimited_value(bs, DELIMITER, 7);
+  char* cpath = get_delimited_value(bs, DELIMITER, 8);
   if (cpath) if (strlen(cpath) <= 1 && *cpath == '0') cpath = NULL;
 
   if (dpath) 
@@ -414,10 +385,10 @@ Label* init_label_offset(SDL_Renderer* r, char* path, int offset) {
   // to avoid a memory leak this becomes a lot more annoying
   // grab xywh values
   float x, y, w, h;
-  char* tx = get_delimited_value(bs, DELIMITER, 0);
-  char* ty = get_delimited_value(bs, DELIMITER, 1);
-  char* tw = get_delimited_value(bs, DELIMITER, 2);
-  char* th = get_delimited_value(bs, DELIMITER, 3);
+  char* tx = get_delimited_value(bs, DELIMITER, 1);
+  char* ty = get_delimited_value(bs, DELIMITER, 2);
+  char* tw = get_delimited_value(bs, DELIMITER, 3);
+  char* th = get_delimited_value(bs, DELIMITER, 4);
 
   x = atof(tx); free(tx);
   y = atof(ty); free(ty);
@@ -425,10 +396,10 @@ Label* init_label_offset(SDL_Renderer* r, char* path, int offset) {
   h = atof(th); free(th);
 
   // get text and texpath
-  char* text = get_delimited_value(bs, DELIMITER, 4);
+  char* text = get_delimited_value(bs, DELIMITER, 5);
   if (!text) return NULL;
 
-  char* texpath = get_delimited_value(bs, DELIMITER, 5);
+  char* texpath = get_delimited_value(bs, DELIMITER, 6);
   if (!texpath)
     return NULL;
 
@@ -441,18 +412,24 @@ Label* init_label_offset(SDL_Renderer* r, char* path, int offset) {
   Label* dest = init_label(r, x, y, w, h, text, texpath);
   if (!dest) return NULL;
 
+  char* id = get_delimited_value(bs, DELIMITER, 0);
+  if (id) {
+    add_element_id(&dest->base, id);
+    free(id);
+  }
+  
   int c, g, b, a;
-  char* tc = get_delimited_value(bs, DELIMITER, 6); 
-  char* tg = get_delimited_value(bs, DELIMITER, 7);
-  char* tb = get_delimited_value(bs, DELIMITER, 8);
-  char* ta = get_delimited_value(bs, DELIMITER, 9);
+  char* tc = get_delimited_value(bs, DELIMITER, 7); 
+  char* tg = get_delimited_value(bs, DELIMITER, 8);
+  char* tb = get_delimited_value(bs, DELIMITER, 9);
+  char* ta = get_delimited_value(bs, DELIMITER, 10);
 
   c = atoi(tc); free(tc);
   g = atoi(tg); free(tg);
   b = atoi(tb); free(tb);
   a = atoi(ta); free(ta);
 
-  if (a != 0)
+  if (a != 1)
     add_label_bg_color(dest, c, g, b, a);
 
   free(bs);
@@ -495,6 +472,12 @@ Label* init_label_match(SDL_Renderer* r, char* path, char* match) {
   Label* dest = init_label(r, x, y, w, h, text, texpath);
   if (!dest) return NULL;
 
+  char* id = get_delimited_value(bs, DELIMITER, 0);
+  if (id) {
+    add_element_id(&dest->base, id);
+    free(id);
+  }
+
   int c, g, b, a;
   char* tc = get_delimited_value(bs, DELIMITER, 6); 
   char* tg = get_delimited_value(bs, DELIMITER, 7);
@@ -506,7 +489,7 @@ Label* init_label_match(SDL_Renderer* r, char* path, char* match) {
   b = atoi(tb); free(tb);
   a = atoi(ta); free(ta);
 
-  if (a != 0)
+  if (a != 1)
     add_label_bg_color(dest, c, g, b, a);
 
   free(bs);
@@ -514,6 +497,19 @@ Label* init_label_match(SDL_Renderer* r, char* path, char* match) {
   if (texpath) free(texpath);
   return dest;
 }
+
+// search a menu for an ELEMENT with id and updates text to text
+void update_label_text(Menu* m, char* id, char* text) {
+  if (m->count < 1) return;
+  Label* dest = NULL;
+  for (size_t i = 0; i < m->count; i++) {
+    if (!strcmp(m->elements[i]->id, id)) {
+      dest = (Label*) m->elements[i];
+      strcpy(dest->text, text);
+      dest->text_len = strlen(dest->text) + 1;
+    }
+  }
+}  
 
 void add_label_bg_color(Label* t, Uint8 r, Uint8 g, Uint8 b, Uint8 a) {
   t->color.r = r;
@@ -543,14 +539,11 @@ void render_label(Application* app, Element* e) {
   // render bg
   if (t->bg) { // render background texture 
     SDL_RenderTexture(app->renderer, t->bg, NULL, &t->base.rect);
-  } else if (t->color.a != 0) { // if texture not set, use color if it was added
+  } else if (t->color.a < 2) { // if texture not set, use color if it was added
     SDL_SetRenderDrawColor(app->renderer, t->color.r, t->color.g, t->color.b, t->color.a);
     SDL_RenderFillRect(app->renderer, &t->base.rect);
-  } else { // else, render some random background...or nothing? hmm
-    SDL_SetRenderDrawColor(app->renderer, 255, 255, 0, 255);
-    SDL_RenderFillRect(app->renderer, &t->base.rect);
-  }
-
+  } // else, render nothing
+  
   // render text
   if (!t->text) return;
 
@@ -576,7 +569,7 @@ void free_label(Element* e) {
 
   if (dest->text) free(dest->text);
   if (dest->bg)   SDL_DestroyTexture(dest->bg);
-  
+
   free(dest);
 }
 
@@ -629,17 +622,17 @@ Texture* init_texture_offset(SDL_Renderer* r, char* path, int offset) {
   if (!bs) return NULL;
   
   float x, y, w, h;
-  char* tx = get_delimited_value(bs, DELIMITER, 0);
-  char* ty = get_delimited_value(bs, DELIMITER, 1);
-  char* tw = get_delimited_value(bs, DELIMITER, 2);
-  char* th = get_delimited_value(bs, DELIMITER, 3);
+  char* tx = get_delimited_value(bs, DELIMITER, 1);
+  char* ty = get_delimited_value(bs, DELIMITER, 2);
+  char* tw = get_delimited_value(bs, DELIMITER, 3);
+  char* th = get_delimited_value(bs, DELIMITER, 4);
 
   x = atof(tx); free(tx);
   y = atof(ty); free(ty);
   w = atof(tw); free(tw);
   h = atof(th); free(th);
 
-  char* texpath = get_delimited_value(bs, DELIMITER, 4);
+  char* texpath = get_delimited_value(bs, DELIMITER, 5);
   if (!texpath) return NULL;
 
   Texture* dest;
@@ -649,6 +642,12 @@ Texture* init_texture_offset(SDL_Renderer* r, char* path, int offset) {
     dest = init_texture_dimensions(r, texpath, x, y, w, h);
   }
   if (!dest) return NULL;
+
+  char* id = get_delimited_value(bs, DELIMITER, 0);
+  if (id) {
+    add_element_id(&dest->base, id);
+    free(id);
+  }
 
   free(bs);
   if (texpath) free(texpath);
@@ -662,17 +661,17 @@ Texture* init_texture_match(SDL_Renderer* r, char* path, char* match) {
   if (!bs) return NULL;
   
   float x, y, w, h;
-  char* tx = get_delimited_value(bs, DELIMITER, 0);
-  char* ty = get_delimited_value(bs, DELIMITER, 1);
-  char* tw = get_delimited_value(bs, DELIMITER, 2);
-  char* th = get_delimited_value(bs, DELIMITER, 3);
+  char* tx = get_delimited_value(bs, DELIMITER, 1);
+  char* ty = get_delimited_value(bs, DELIMITER, 2);
+  char* tw = get_delimited_value(bs, DELIMITER, 3);
+  char* th = get_delimited_value(bs, DELIMITER, 4);
 
   x = atof(tx); free(tx);
   y = atof(ty); free(ty);
   w = atof(tw); free(tw);
   h = atof(th); free(th);
 
-  char* texpath = get_delimited_value(bs, DELIMITER, 4);
+  char* texpath = get_delimited_value(bs, DELIMITER, 5);
   if (!texpath) return NULL;
 
   Texture* dest;
@@ -682,6 +681,12 @@ Texture* init_texture_match(SDL_Renderer* r, char* path, char* match) {
     dest = init_texture_dimensions(r, texpath, x, y, w, h);
   }
   if (!dest) return NULL;
+
+  char* id = get_delimited_value(bs, DELIMITER, 0);
+  if (id) {
+    add_element_id(&dest->base, id);
+    free(id);
+  }
 
   free(bs);
   if (texpath) free(texpath);
@@ -710,137 +715,4 @@ void destroy_texture(Element* e) {
   free(t);
 }
 
-/* menu shit */
 
-Menu* init_menu() {
-  Menu* dest = malloc(sizeof(Menu));
-  if (!dest) return NULL;
-  
-  dest->count = 0;
-  dest->capacity = MENU_ELEMENT_COUNT;
-
-  dest->elements = malloc(sizeof(Element*) * MENU_ELEMENT_COUNT);
-  if (!dest->elements) {
-    printf("poop in init_menu\n");
-    return NULL;
-  }
-
-  return dest;
-}
-
-int add_element_to_menu(Menu* menu, Element* e) {
-  if (!menu || !e)
-    return 0;
-
-  if (menu->count >= menu->capacity) {
-    size_t new_capacity = menu->capacity == 0 ? MENU_ELEMENT_COUNT : menu->capacity * 2;
-    Element** new_elements = realloc(menu->elements, new_capacity * sizeof(*new_elements));
-
-    if (!new_elements)
-      return 0;
-
-    menu->elements = new_elements;
-    menu->capacity = new_capacity;
-  }
-
-  menu->elements[menu->count++] = e;
-
-  return 1;
-}
-
-void handle_menu_event(Application* app, Menu* menu, SDL_Event* e) {
-  if (!menu) return;
-  
-  for (int i = 0; i < menu->count; i++) {
-    if (!menu->elements[i]) { // just incase
-      SDL_Log("warning! button no. %d in menu is...invalid?", i);
-      continue;
-    }
-    handle_element_event(app, menu->elements[i], e);
-  }
-}
-
-void render_menu(Application* app, Menu* menu) {
-  if (!app->renderer || !menu) return;
-
-  for (int i = 0; i < menu->count; i++) {
-    if (!menu->elements[i]) { 
-      SDL_Log("warning! button no. %d in menu is...invalid?", i);
-      continue;
-    }
-    draw_element(app, menu->elements[i]);
-  }
-}
-
-void free_menu(Menu* src) {
-  if (!src) return;
-
-  free(src->elements);
-  free(src);
-}
-
-
-Screen* init_screen(Menu* m) {
-  Screen* dest = malloc(sizeof(Screen));
-  if (!dest) {
-    free_menu(m);
-    return NULL;
-  }
-
-  dest->current_menu = m;
-  //dest->current_game = g;
-
-  dest->cur_menu = 0;
-  dest->prv_menu = 0;
-
-  dest->cur_game= 0;
-  dest->prv_game = 0;
-  return dest;
-}
-
-
-void free_screen(Screen* s) {
-  if (!s) return;
-
-  free_menu(s->current_menu);
-  free(s);
-}
-
-
-int update_screen_current_menu(Screen* s, Menu* m) {
-  if (!s || !m) return 0;
-
-  if (s->current_menu != m) {
-    free_menu(s->current_menu);
-  }
-
-  s->current_menu = m;
-  return 1;
-}
-
-
-void handle_screen_input(Application* app, Screen* s, SDL_Event* e) {
-  handle_menu_event(app, s->current_menu, e);
-}
-
-
-void render_screen(Application* app, Screen* s) {
-  render_menu(app, s->current_menu);
-}
-
-
-int should_change_screen_menu(Screen* s) {
-  if (s->cur_menu != s->prv_menu) {
-    s->prv_menu = s->cur_menu;
-    return 1;
-  }
-  return 0;
-}
-
-int should_change_screen_game(Screen* s) {
-  if (s->cur_game != s->prv_menu) {
-    s->prv_game = s->cur_game;
-    return 1;
-  }
-  return 0;
-}

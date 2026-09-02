@@ -1,0 +1,9 @@
+chang,480,0,80,48,notext,assets/button_default.png,assets/button_pressed.png,0
+butto,560,0,80,48,button,notex
+audio,480,48,160,48,audio,notex
+top,480,96,80,48,hello,0,255,128,0,0
+bot,560,96,80,48,hi,0,255,128,0,0
+chuds,480,144,0,0,assets/hig_th_sprites.png
+chudu,480,176,64,64,assets/hig_th_sprites.png
+pause,480,420,30,30,p,notex
+resume,480,450,30,30,r,notex
